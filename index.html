@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faire sonner la matière — DnMade Objet 1re année — ESAAT</title>
+<style>
+:root{--ink:#1f2328;--muted:#5b6470;--bg:#f6f3ee;--card:#fff;--line:#e4ded3;--accent:#c2562b;--accent2:#2b6cb0;--ok:#2f855a;--bad:#c53030;--soft:#f3ede3}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px}
+nav#side{position:fixed;top:0;left:0;bottom:0;width:255px;background:#24201c;color:#eee;overflow-y:auto;padding:18px 14px}
+nav#side h1{font-size:18px;margin:0 0 2px;color:#fff;line-height:1.2}
+nav#side .sub{font-size:12px;color:#bbb;margin-bottom:14px}
+nav#side a{display:block;color:#ddd;text-decoration:none;padding:5px 8px;border-radius:6px;font-size:14px}
+nav#side a:hover,nav#side a.active{background:#3d362f;color:#fff}
+nav#side .tools{margin-top:14px;border-top:1px solid #444;padding-top:12px;display:flex;flex-direction:column;gap:6px}
+nav#side .tools button{width:100%;text-align:left;background:#3a342e;color:#fff;border-color:#555}
+nav#side .tools button.primary{background:var(--accent);border-color:var(--accent)}
+#saveStatus{font-size:12px;color:#9fd99f;min-height:16px}
+main{margin-left:255px;padding:24px 32px 80px;max-width:1060px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 28px;margin-bottom:26px;scroll-margin-top:12px}
+h2{margin-top:0;font-size:25px;color:var(--accent)}
+h3{font-size:18px;margin:24px 0 8px}
+.lead{color:var(--muted);font-size:17px}
+.box{background:var(--soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:6px;margin:12px 0}
+.box.blue{border-color:var(--accent2);background:#eef4fb}
+.box.warn{border-color:#d69e2e;background:#fdf6e3}
+.box.green{border-color:var(--ok);background:#eef8f1}
+.formula{font-family:Georgia,"Times New Roman",serif;font-size:20px;text-align:center;margin:12px 0;padding:10px;background:#fff;border:1px dashed #d8cfc0;border-radius:8px}
+.widget{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:16px 0;background:#fcfbf9}
+.widget .wt{font-weight:700;font-size:15px;margin-bottom:6px;color:#444}
+.widget canvas{width:100%;display:block;background:#fff;border-radius:8px;border:1px solid #eee;touch-action:none}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:10px 0;font-size:14px}
+.ctrl label{display:flex;align-items:center;gap:6px}
+button{font:inherit;font-size:14px;padding:6px 12px;border-radius:8px;border:1px solid #bbb;background:#fff;cursor:pointer;color:inherit}
+button:hover{filter:brightness(.96)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button.on{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.q{margin:16px 0}
+.q>label{font-weight:600;display:block;margin-bottom:5px}
+textarea,input[type=text],input[type=number],select{font:inherit;font-size:15px;border:1px solid #ccc;border-radius:8px;padding:6px 9px;background:#fff;color:inherit}
+input[type=number]{width:90px}
+textarea{width:100%;min-height:84px;resize:vertical}
+.out{font-weight:600;color:var(--accent2)}
+.big{font-size:22px;font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+td input,td textarea{width:100%;border:none;padding:3px;background:transparent;font-size:14px}
+td textarea{min-height:34px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ident{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 18px}
+.ident label{display:flex;flex-direction:column;font-weight:600;font-size:14px}
+/* QCM */
+.qcm{border:1px dashed #b9c8dc;background:#f6f9fd;border-radius:10px;padding:10px 14px;margin:16px 0}
+.qcm .qq{font-weight:700;margin:0 0 6px}
+.qcm label{display:block;cursor:pointer;padding:2px 0}
+.qcm .fb{margin-top:6px;font-size:14px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+/* Sketch */
+.sketch{border:1px solid var(--line);border-radius:10px;padding:10px;margin:16px 0;background:#fcfbf9}
+.sk-title{font-weight:700;margin-bottom:6px}
+.sk-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.sk-bar .sk-c{width:24px;height:24px;border-radius:50%;padding:0;border:2px solid #fff;box-shadow:0 0 0 1px #aaa}
+.sk-bar .sk-c.on{box-shadow:0 0 0 3px var(--accent2)}
+.sketch canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid #ddd;border-radius:6px;cursor:crosshair;touch-action:none}
+/* clavier */
+#kbd{position:relative;height:150px;margin:10px 0;user-select:none}
+#kbd .w{position:absolute;top:0;width:44px;height:150px;border:1px solid #999;background:#fff;border-radius:0 0 6px 6px;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;font-size:11px;padding-bottom:6px}
+#kbd .b{position:absolute;top:0;width:28px;height:92px;background:#222;border-radius:0 0 4px 4px;cursor:pointer;z-index:2}
+#kbd .w.penta{background:#fde8c8}
+#kbd .w.hit,#kbd .b.hit{background:var(--accent2)!important}
+.freqtab td,.freqtab th{text-align:center;font-size:13px;padding:3px}
+/* journal / sources / photos */
+.src{border:1px solid var(--line);border-radius:10px;padding:10px;margin:10px 0;background:#fcfbf9}
+.src .row{display:grid;grid-template-columns:1fr 1fr 160px;gap:8px;margin-bottom:6px}
+.src input,.src select{width:100%}
+#photoGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+#photoGrid figure{margin:0;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff}
+#photoGrid img{width:100%;border-radius:4px}
+#photoGrid input{width:100%;margin-top:4px}
+.del{color:var(--bad);border-color:#e3b5b5;padding:2px 8px}
+.muted{color:var(--muted);font-size:14px}
+.peaks{font-family:ui-monospace,Consolas,monospace;font-size:14px}
+.tag{display:inline-block;background:#eee;border-radius:5px;padding:0 6px;font-size:13px}
+#report{display:none}
+@media (max-width:900px){nav#side{position:static;width:auto}main{margin-left:0;padding:14px}.grid2,.ident{grid-template-columns:1fr}}
+@media print{
+ nav#side,main{display:none!important}
+ #report{display:block;font-size:11pt;color:#000}
+ body{background:#fff}
+ #report h1{font-size:18pt;margin:0 0 4px;color:#c2562b}
+ #report h2{font-size:14pt;color:#c2562b;border-bottom:1px solid #c2562b;margin-top:18px;break-after:avoid}
+ .rp-q{margin:6px 0 10px;break-inside:avoid}
+ .rp-ql{font-weight:700}
+ .rp-a{padding:3px 0 0 10px;border-left:3px solid #ddd}
+ .rp-fig{margin:8px 0;break-inside:avoid;text-align:center}
+ .rp-fig img{max-width:100%;max-height:9cm;border:1px solid #bbb}
+ .rp-fig figcaption{font-size:9pt;color:#444}
+ .rp-photos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ table{break-inside:auto} tr{break-inside:avoid}
+ @page{size:A4;margin:14mm}
+}
+</style>
+</head>
+<body>
+
+<nav id="side">
+ <h1>🎵 Faire sonner la matière</h1>
+ <div class="sub">DnMade Objet 1 · ESAAT<br>Technologie et matériaux</div>
+ <a href="#s0">0 · Accueil &amp; mode d'emploi</a>
+ <a href="#s1">1 · Les ondes mécaniques</a>
+ <a href="#s2">2 · Le son et sa propagation</a>
+ <a href="#s3">3 · Ondes stationnaires &amp; résonance</a>
+ <a href="#s4">4 · Hauteur, timbre, harmoniques</a>
+ <a href="#s5">5 · Notes et gammes</a>
+ <a href="#s6">6 · Les tubes</a>
+ <a href="#s7">7 · Les lames et les lattes</a>
+ <a href="#s8">8 · Concevoir son instrument</a>
+ <a href="#s9">9 · Journal d'expériences</a>
+ <a href="#s10">10 · Recherches documentaires</a>
+ <a href="#s11">11 · Synthèse personnelle</a>
+ <div class="tools">
+  <div id="saveStatus">Enregistrement automatique</div>
+  <button class="primary" id="btnPdf">📄 Générer mon PDF</button>
+  <button id="btnExport">💾 Exporter mon travail (.json)</button>
+  <button id="btnImport">📂 Importer un travail (.json)</button>
+  <input type="file" id="fileImport" accept=".json,application/json" hidden>
+ </div>
+</nav>
+
+<main>
+
+<!-- ============ 0 ACCUEIL ============ -->
+<section id="s0" data-report="no">
+ <h2>Faire sonner la matière</h2>
+ <p class="lead">Physique des instruments à tubes et à lames. Ce document accompagne votre projet : concevoir et fabriquer en binôme un instrument de musique rudimentaire avec des tubes PVC, des lattes de bois ou des lames d'acier ou d'aluminium.</p>
+
+ <div class="box blue">
+  <b>Trois questions guident tout le document :</b>
+  <ol style="margin:6px 0 0">
+   <li>Pourquoi un tube ou une lame donne-t-il une note <i>précise</i> et pas n'importe quel bruit ?</li>
+   <li>Comment choisir les longueurs pour obtenir une gamme de notes justes ?</li>
+   <li>Comment tenir ou fixer l'objet pour qu'il sonne longtemps au lieu d'être étouffé ?</li>
+  </ol>
+ </div>
+
+ <h3>Votre identité</h3>
+ <div class="ident">
+  <label>Prénom <input type="text" data-key="prenom"></label>
+  <label>Nom <input type="text" data-key="nom"></label>
+  <label>Groupe <input type="text" data-key="groupe"></label>
+  <label>Binôme avec <input type="text" data-key="binome"></label>
+ </div>
+
+ <h3>Ce que vous devez rendre</h3>
+ <p>Un <b>PDF personnel</b>. Vous travaillez en binôme, mais chacun rédige ses propres réponses, ses croquis et sa synthèse. Le PDF regroupe automatiquement :</p>
+ <ul>
+  <li>vos réponses aux questions et vos croquis ;</li>
+  <li>votre calcul de dimensions (partie 8) ;</li>
+  <li>votre journal de mesures et vos photos (partie 9) ;</li>
+  <li>vos sources analysées (partie 10) ;</li>
+  <li>votre synthèse (partie 11).</li>
+ </ul>
+
+ <h3>Mode d'emploi</h3>
+ <ul>
+  <li><b>Sauvegarde automatique</b> : vos réponses sont gardées dans <i>ce navigateur, sur cet ordinateur</i>.</li>
+  <li><b>Changer d'ordinateur</b> (portable ↔ salle) : cliquez sur « 💾 Exporter » à la fin de chaque séance, puis sur « 📂 Importer » sur l'autre ordinateur. <b>Exportez à chaque fin de séance</b>, c'est votre copie de secours.</li>
+  <li><b>PDF</b> : cliquez sur « 📄 Générer mon PDF », puis choisissez la destination « <b>Enregistrer au format PDF</b> » dans la fenêtre d'impression.</li>
+  <li><b>Son</b> : les animations produisent des sons. Prévoyez un casque ou des écouteurs en salle. L'analyseur (partie 4) utilise le micro, qu'il faut autoriser.</li>
+ </ul>
+ <div class="box warn">Ordinateur partagé ? Avant de partir, exportez votre travail puis cliquez sur ce bouton pour libérer le navigateur : <button id="btnReset" class="del">Effacer le dossier de ce navigateur</button></div>
+
+ <h3>Planning indicatif (séances de 2 h)</h3>
+ <table>
+  <tr><th>Séance</th><th>Théorie (ce document)</th><th>Atelier</th></tr>
+  <tr><td>1</td><td>Parties 1 à 4</td><td>Premiers essais sur des chutes : taper, écouter, mesurer avec l'analyseur.</td></tr>
+  <tr><td>2</td><td>Parties 5 à 7</td><td>Mesures sur tubes et lames, journal, caractérisation du matériau.</td></tr>
+  <tr><td>3</td><td>Partie 8 et recherches (partie 10)</td><td>Calcul des longueurs, croquis coté, découpe, premiers montages.</td></tr>
+  <tr><td>4</td><td>Parties 9 à 11</td><td>Accord fin, structure et finitions, photos, synthèse, envoi du PDF.</td></tr>
+ </table>
+</section>
+
+<!-- ============ 1 ONDES ============ -->
+<section id="s1">
+ <h2>1 · Les ondes mécaniques</h2>
+ <p>Une <b>onde mécanique</b> est la propagation d'une <b>perturbation</b> dans un <b>milieu matériel</b> : solide, liquide ou gaz. Chaque petite portion du milieu se met à osciller autour de sa position, puis y revient. Elle transmet le mouvement à sa voisine, et ainsi de suite.</p>
+ <div class="box">Une onde transporte de l'<b>énergie</b>, mais <b>pas de matière</b> (pas de déplacement d'ensemble). Exemple : dans une « ola » au stade, la vague fait le tour des tribunes, mais chaque spectateur reste à sa place.</div>
+ <p>On distingue deux types d'ondes :</p>
+ <ul>
+  <li><b>Onde transversale</b> : le milieu vibre <i>perpendiculairement</i> à la direction de propagation. Exemples : une corde qu'on secoue, une lame qui fléchit.</li>
+  <li><b>Onde longitudinale</b> : le milieu vibre <i>dans la même direction</i> que la propagation. Il se forme une succession de compressions et de détentes. Exemples : un ressort qu'on pousse, le <b>son</b> dans l'air.</li>
+ </ul>
+
+ <div class="widget">
+  <div class="wt">Animation : transversale ou longitudinale ?</div>
+  <div class="ctrl">
+   <button id="ondeT">Transversale</button><button id="ondeL">Longitudinale</button>
+   <span style="width:14px"></span>
+   <button id="ondeCont">Onde continue</button><button id="ondePulse">Lancer une impulsion</button>
+   <label>Fréquence <input type="range" id="ondeF" min="0.3" max="2" step="0.1" value="0.6"> <span id="ondeFv">0,6</span> (unités arbitraires)</label>
+  </div>
+  <canvas id="cvOnde"></canvas>
+  <p class="muted">La particule rouge est un « témoin » : suivez-la des yeux.</p>
+ </div>
+
+ <h3>Les grandeurs qui décrivent une onde</h3>
+ <ul>
+  <li><b>Période T</b> (en s) : durée d'une oscillation complète d'un point du milieu.</li>
+  <li><b>Fréquence f</b> (en hertz, Hz) : nombre d'oscillations par seconde, avec <b>f = 1 / T</b>.</li>
+  <li><b>Célérité v</b> (en m/s) : vitesse à laquelle la perturbation avance.</li>
+  <li><b>Longueur d'onde λ</b> (en m) : distance parcourue par l'onde pendant une période. C'est aussi la distance entre deux points qui vibrent « en même temps », dans le même état.</li>
+ </ul>
+ <div class="formula">λ = v × T = v / f</div>
+
+ <div class="q"><label>1.1 Observez la particule rouge. Se déplace-t-elle avec l'onde ? Décrivez son mouvement en mode transversal, puis en mode longitudinal.</label><textarea data-key="q1_1"></textarea></div>
+ <div class="q"><label>1.2 Donnez un exemple d'onde transversale et un exemple d'onde longitudinale tirés de la vie courante, autres que ceux du texte.</label><textarea data-key="q1_2"></textarea></div>
+ <div class="q"><label>1.3 En mode continu, augmentez la fréquence. Que devient la longueur d'onde λ ? Expliquez à l'aide de la relation λ = v / f.</label><textarea data-key="q1_3"></textarea></div>
+
+ <div class="qcm" data-key="qcm1" data-answer="b" data-explain="Chaque portion du milieu oscille sur place : c'est l'énergie qui voyage, pas la matière.">
+  <p class="qq">Auto-test : une onde mécanique transporte…</p>
+  <label><input type="radio" name="qcm1" value="a"> de la matière, de la source vers le récepteur</label>
+  <label><input type="radio" name="qcm1" value="b"> de l'énergie, sans transport d'ensemble de matière</label>
+  <label><input type="radio" name="qcm1" value="c"> de la matière et de l'énergie</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+
+ <div class="sketch" data-key="sk1" data-tpl="grille" data-h="420" data-title="Croquis 1 : dessinez une onde transversale et une onde longitudinale. Indiquez la direction de propagation, la direction de vibration et la longueur d'onde λ."></div>
+</section>
+
+<!-- ============ 2 SON ============ -->
+<section id="s2">
+ <h2>2 · Le son et sa propagation</h2>
+ <p>Le <b>son</b> est une <b>onde mécanique longitudinale</b>. Une source vibre : la membrane d'un haut-parleur, une lame frappée, la colonne d'air d'un tube. En vibrant, elle comprime puis détend l'air voisin. Ces <b>surpressions</b> et <b>dépressions</b> se propagent de proche en proche jusqu'à notre tympan, qui se met à vibrer à son tour.</p>
+ <div class="box"><b>Pas de milieu, pas de son.</b> Dans le vide, rien ne peut transmettre la vibration. Si on place un réveil qui sonne sous une cloche et qu'on en retire l'air, on ne l'entend presque plus.</div>
+ <p>L'oreille humaine perçoit environ de <b>20 Hz</b> (très grave) à <b>20 000 Hz</b> (très aigu). En dessous, ce sont des infrasons ; au-dessus, des ultrasons.</p>
+
+ <h3>La vitesse du son dépend du milieu</h3>
+ <p>Plus un milieu est <b>rigide</b> par rapport à sa <b>masse</b>, plus le son y va vite. Dans une barre ou une lame, la vitesse vaut :</p>
+ <div class="formula">v = √( E / ρ )</div>
+ <p class="muted"><b>E</b> est le module d'Young du matériau (sa rigidité, en Pa). <b>ρ</b> est sa masse volumique (en kg/m³). Ce sont deux propriétés de matériau que vous retrouverez en Technologie et matériaux.</p>
+ <table>
+  <tr><th>Milieu</th><th>E (GPa)</th><th>ρ (kg/m³)</th><th>Vitesse du son (m/s)</th></tr>
+  <tr><td>Air à 20 °C</td><td>—</td><td>1,2</td><td>343</td></tr>
+  <tr><td>Eau</td><td>—</td><td>1000</td><td>1480</td></tr>
+  <tr><td>PVC</td><td>≈ 3</td><td>≈ 1400</td><td>≈ 1500</td></tr>
+  <tr><td>Bois résineux (pin, sapin), le long des fibres</td><td>≈ 10</td><td>≈ 500</td><td>≈ 4500</td></tr>
+  <tr><td>Bois dur (chêne), le long des fibres</td><td>≈ 12</td><td>≈ 700</td><td>≈ 4100</td></tr>
+  <tr><td>Aluminium (barre)</td><td>69</td><td>2700</td><td>?</td></tr>
+  <tr><td>Acier (barre)</td><td>210</td><td>7850</td><td>?</td></tr>
+ </table>
+ <p>Dans l'air, la vitesse dépend aussi un peu de la température θ (en °C) : <b>v ≈ 331 + 0,6 × θ</b>.</p>
+
+ <div class="widget">
+  <div class="wt">Course du son sur 100 m (ralenti × 20)</div>
+  <div class="ctrl"><button class="primary" id="raceGo">▶ Top départ</button></div>
+  <canvas id="cvRace"></canvas>
+ </div>
+
+ <div class="q"><label>2.1 Pourquoi le son ne peut-il pas se propager dans le vide de l'espace ?</label><textarea data-key="q2_1"></textarea></div>
+ <div class="q"><label>2.2 Calculez la vitesse du son dans l'aluminium et dans l'acier avec v = √(E/ρ). Attention aux unités : 1 GPa = 10⁹ Pa. Que remarquez-vous ? Quelle conséquence pour deux lames d'aluminium et d'acier de mêmes dimensions ?</label><textarea data-key="q2_2"></textarea></div>
+ <div class="q"><label>2.3 Calculez le temps mis par le son pour parcourir 10 m dans l'air, puis dans une lame d'acier.</label><textarea data-key="q2_3"></textarea></div>
+ <div class="q"><label>2.4 Expérience : collez l'oreille au bout d'une table pendant que votre binôme gratte doucement l'autre bout. Comparez avec l'écoute dans l'air, puis interprétez.</label><textarea data-key="q2_4"></textarea></div>
+ <div class="q"><label>2.5 Calculez la longueur d'onde dans l'air (20 °C) du La3 à 440 Hz. Cet ordre de grandeur vous semble-t-il proche de la taille des instruments ?</label><textarea data-key="q2_5"></textarea></div>
+
+ <div class="qcm" data-key="qcm2" data-answer="c" data-explain="Les solides rigides (acier, aluminium, bois) transmettent le son bien plus vite que l'eau et que l'air. Dans le vide, il ne se propage pas du tout.">
+  <p class="qq">Auto-test : le son se propage le plus vite dans…</p>
+  <label><input type="radio" name="qcm2" value="a"> l'air</label>
+  <label><input type="radio" name="qcm2" value="b"> l'eau</label>
+  <label><input type="radio" name="qcm2" value="c"> l'acier</label>
+  <label><input type="radio" name="qcm2" value="d"> le vide</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+</section>
+
+<!-- ============ 3 ONDES STATIONNAIRES ============ -->
+<section id="s3">
+ <h2>3 · Ondes stationnaires et résonance</h2>
+ <p>Que se passe-t-il quand une onde est <b>enfermée</b> ? C'est le cas d'une corde fixée aux deux bouts, de l'air dans un tube ou d'une lame. L'onde se <b>réfléchit</b> aux extrémités, et l'onde aller se superpose à l'onde retour. Il apparaît alors une <b>onde stationnaire</b> : elle semble vibrer sur place sans avancer.</p>
+ <ul>
+  <li>Les <b>nœuds (N)</b> sont des points qui ne bougent jamais.</li>
+  <li>Les <b>ventres (V)</b> sont des points où la vibration est maximale.</li>
+  <li>Deux nœuds voisins sont séparés de <b>λ / 2</b>.</li>
+ </ul>
+
+ <div class="widget">
+  <div class="wt">Animation : naissance d'une onde stationnaire sur une corde fixée aux deux bouts</div>
+  <div class="ctrl" id="statModes">Mode : <button data-n="1" class="on">1</button><button data-n="2">2</button><button data-n="3">3</button><button data-n="4">4</button><button data-n="5">5</button>
+   <label><input type="checkbox" id="statComp"> montrer l'onde aller (bleu) et l'onde retour (rouge)</label></div>
+  <canvas id="cvStat"></canvas>
+ </div>
+
+ <p>Seules certaines longueurs d'onde « tiennent » dans la longueur L : celles pour lesquelles un nombre entier de demi-longueurs d'onde remplit exactement L.</p>
+ <div class="formula">L = n × λ / 2 &nbsp;&nbsp;⟹&nbsp;&nbsp; f<sub>n</sub> = n × v / (2L) &nbsp;&nbsp;(n = 1, 2, 3…)</div>
+ <p>Ces fréquences particulières sont les <b>fréquences propres</b> ou <b>modes propres</b> de l'objet. La plus basse, f<sub>1</sub>, est le <b>fondamental</b>.</p>
+
+ <h3>La résonance</h3>
+ <p>Si l'on excite un objet à l'une de ses fréquences propres, il vibre avec une grande amplitude : c'est la <b>résonance</b>. À une autre fréquence, il bouge à peine.</p>
+ <div class="box green">C'est le principe de tous vos instruments. Un coup de mailloche apporte un « mélange » de toutes les fréquences. L'objet, lui, ne garde et ne fait durer <b>que ses fréquences propres</b>, et c'est ce qui donne une note.</div>
+
+ <div class="widget">
+  <div class="wt">Simulateur : on fait vibrer une corde à une fréquence choisie</div>
+  <div class="ctrl"><label>Fréquence d'excitation <input type="range" id="resF" min="0.2" max="4.6" step="0.01" value="0.6" style="width:280px"> <span id="resFv" class="out"></span></label>
+   <button id="resSnd">🔊 Écouter</button></div>
+  <canvas id="cvRes"></canvas>
+  <p class="muted">Déplacez le curseur lentement. Le graphique du bas trace l'amplitude obtenue en fonction de la fréquence d'excitation.</p>
+ </div>
+
+ <div class="q"><label>3.1 Cochez « montrer l'onde aller et l'onde retour ». Que se passe-t-il exactement en un nœud ?</label><textarea data-key="q3_1"></textarea></div>
+ <div class="q"><label>3.2 Pour le mode 3, combien y a-t-il de nœuds (extrémités comprises) et de ventres ? Quelle relation lie L et λ ?</label><textarea data-key="q3_2"></textarea></div>
+ <div class="q"><label>3.3 Avec le simulateur de résonance, relevez les fréquences (en multiples de f₁) qui donnent une amplitude maximale. Que remarquez-vous ?</label><textarea data-key="q3_3"></textarea></div>
+ <div class="q"><label>3.4 Citez un autre exemple de résonance dans la vie courante.</label><textarea data-key="q3_4"></textarea></div>
+
+ <div class="qcm" data-key="qcm3" data-answer="b" data-explain="Deux nœuds consécutifs sont séparés d'une demi-longueur d'onde.">
+  <p class="qq">Auto-test : la distance entre deux nœuds consécutifs vaut…</p>
+  <label><input type="radio" name="qcm3" value="a"> λ / 4</label>
+  <label><input type="radio" name="qcm3" value="b"> λ / 2</label>
+  <label><input type="radio" name="qcm3" value="c"> λ</label>
+  <label><input type="radio" name="qcm3" value="d"> 2 λ</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+
+ <div class="sketch" data-key="sk3" data-tpl="corde" data-h="500" data-title="Croquis 2 : dessinez les 3 premiers modes d'une corde fixée aux deux bouts. Placez les nœuds N, les ventres V et indiquez λ."></div>
+</section>
+
+<!-- ============ 4 TIMBRE ============ -->
+<section id="s4">
+ <h2>4 · Hauteur, intensité, timbre, harmoniques</h2>
+ <p>Nous distinguons les sons par trois qualités :</p>
+ <table>
+  <tr><th>Ce qu'on perçoit</th><th>Ce qui le détermine physiquement</th></tr>
+  <tr><td><b>Hauteur</b> : grave ou aigu</td><td>La fréquence du <b>fondamental</b> f₁</td></tr>
+  <tr><td><b>Intensité</b> : fort ou faible</td><td>L'amplitude de la vibration (mesurée en décibels, dB)</td></tr>
+  <tr><td><b>Timbre</b> : la « couleur » du son</td><td>Les fréquences présentes en plus du fondamental (le <b>spectre</b>) et l'évolution dans le temps (attaque, extinction)</td></tr>
+ </table>
+ <p>Le son d'un instrument n'est jamais une simple sinusoïde. C'est une <b>somme</b> de vibrations de fréquences différentes.</p>
+ <ul>
+  <li>Si ces fréquences sont des multiples entiers du fondamental (f₁, 2f₁, 3f₁…), on les appelle <b>harmoniques</b>. Le signal est périodique et la note est très nette : cordes, tubes, voix.</li>
+  <li>Si ce ne sont pas des multiples entiers, on parle de <b>partiels non harmoniques</b>. Le son est plus « métallique », comme une cloche. C'est le cas des lames, avec des partiels à environ 2,76 f₁ et 5,40 f₁.</li>
+ </ul>
+ <p>Le <b>spectre</b> est le graphique qui donne l'amplitude de chaque fréquence présente dans un son : c'est sa carte d'identité.</p>
+
+ <div class="widget">
+  <div class="wt">Synthétiseur : composez un son avec ses harmoniques</div>
+  <div class="ctrl">
+   <label>Fondamental <input type="range" id="synF" min="110" max="660" step="1" value="220"> <span id="synFv" class="out"></span></label>
+   <button id="synPlay">▶ Écouter en continu</button>
+  </div>
+  <div class="ctrl">Préréglages :
+   <button data-p="pur">Son pur</button><button data-p="ouvert">Tube ouvert</button><button data-p="ferme">Tube fermé</button><button data-p="riche">Son riche</button><button data-p="lame">Lame (non harmonique)</button>
+  </div>
+  <div class="ctrl" id="synSliders"></div>
+  <canvas id="cvSyn"></canvas>
+  <p class="muted">À gauche, la forme du signal en fonction du temps. À droite, son spectre.</p>
+ </div>
+
+ <h3>Analyseur de son : votre accordeur</h3>
+ <p>Cet outil écoute le micro de l'ordinateur et affiche le spectre du son. Il repère les pics de fréquence et donne la note la plus proche. Pour un son bref, comme une lame frappée, cochez « figer automatiquement » : l'affichage se fige juste après le coup.</p>
+ <div class="widget">
+  <div class="ctrl">
+   <button class="primary" id="micStart">🎤 Activer le micro</button>
+   <button id="micFreeze">⏸ Figer</button>
+   <label><input type="checkbox" id="micAuto" checked> figer automatiquement au prochain coup</label>
+   <button id="micToJournal">➕ Ajouter la mesure au journal</button>
+  </div>
+  <div class="big" id="micNote">—</div>
+  <canvas id="cvMic"></canvas>
+  <div class="peaks" id="micPeaks"></div>
+  <p class="muted" id="micMsg">Si le micro ne fonctionne pas (navigateur, autorisation), utilisez l'application gratuite <b>phyphox</b> sur téléphone (outils « Spectre audio » et « Fréquence audio »).</p>
+ </div>
+
+ <div class="q"><label>4.1 Partez du « son pur » puis ajoutez les harmoniques une à une. La hauteur perçue change-t-elle ? Qu'est-ce qui change ?</label><textarea data-key="q4_1"></textarea></div>
+ <div class="q"><label>4.2 Comparez les préréglages « tube ouvert » et « tube fermé » : forme du signal, spectre, impression à l'écoute.</label><textarea data-key="q4_2"></textarea></div>
+ <div class="q"><label>4.3 Avec l'analyseur, chantez un « a » puis un « i » sur la même note. Comment les spectres diffèrent-ils ? Qu'est-ce que cela montre sur le timbre ?</label><textarea data-key="q4_3"></textarea></div>
+ <div class="q"><label>4.4 Tenez une chute de lame métallique entre deux doigts et frappez-la. Relevez les 2 ou 3 premiers pics et calculez f₂/f₁. Comparez à 2,76.</label><textarea data-key="q4_4"></textarea></div>
+ <div class="q"><label>4.5 Frappez l'extrémité d'une chute de tube PVC avec la paume. Relevez les pics. Sont-ils des multiples du premier ?</label><textarea data-key="q4_5"></textarea></div>
+
+ <div class="qcm" data-key="qcm4" data-answer="a" data-explain="Même note, donc même fondamental ; mais les harmoniques n'ont pas les mêmes amplitudes : c'est le timbre.">
+  <p class="qq">Auto-test : une flûte et un xylophone jouent le même La3. Leurs sons ont…</p>
+  <label><input type="radio" name="qcm4" value="a"> le même fondamental mais des spectres différents</label>
+  <label><input type="radio" name="qcm4" value="b"> des fondamentaux différents mais le même spectre</label>
+  <label><input type="radio" name="qcm4" value="c"> exactement le même spectre</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+</section>
+
+<!-- ============ 5 GAMMES ============ -->
+<section id="s5">
+ <h2>5 · Notes et gammes</h2>
+ <p>Une note correspond à une fréquence fondamentale. L'oreille n'est pas sensible aux <i>différences</i> de fréquences, mais à leurs <b>rapports</b>.</p>
+ <ul>
+  <li><b>Octave</b> : on multiplie la fréquence par <b>2</b>. Les deux notes portent le même nom et semblent « pareilles, en plus aigu ». Exemple : La3 = 440 Hz et La4 = 880 Hz.</li>
+  <li><b>Quinte</b> : un rapport d'environ <b>3/2</b>, qui sonne très consonant (déjà décrit par Pythagore). Exemple : Do → Sol.</li>
+ </ul>
+ <h3>La gamme tempérée</h3>
+ <p>Depuis le XVIII<sup>e</sup> siècle, la musique occidentale découpe l'octave en <b>12 demi-tons égaux</b>. Monter d'un demi-ton revient à multiplier la fréquence par le même nombre :</p>
+ <div class="formula">2<sup>1/12</sup> ≈ 1,0595 &nbsp;(soit environ +6 % par demi-ton)</div>
+ <p>Les fréquences forment donc une <b>suite géométrique</b>. Avec la référence <b>La3 = 440 Hz</b> (le diapason) et n le nombre de demi-tons au-dessus du La3 (n est négatif en dessous) :</p>
+ <div class="formula">f = 440 × 1,0595<sup>n</sup></div>
+ <p class="muted">Convention française : La3 = 440 Hz. Les anglo-saxons notent cette même note A4.</p>
+
+ <h3>Gammes utiles pour le projet</h3>
+ <ul>
+  <li><b>Gamme majeure</b> (Do Ré Mi Fa Sol La Si Do), 7 notes par octave. Les écarts sont : ton, ton, ½ ton, ton, ton, ton, ½ ton.</li>
+  <li><b>Gamme pentatonique</b> (Do Ré Mi Sol La), 5 notes par octave et aucun demi-ton. Toutes les notes sonnent bien ensemble, même jouées au hasard. On la trouve dans de nombreuses musiques du monde : Asie, Afrique, blues…</li>
+ </ul>
+ <div class="box green">Conseil : une <b>pentatonique sur une octave ou une octave et demie</b> (6 à 8 notes) est un excellent objectif pour un premier instrument. Une note est jugée juste si l'écart reste inférieur à environ <b>1 %</b>. Au-delà de 3 %, on approche du demi-ton et l'oreille entend clairement la fausse note.</div>
+
+ <div class="widget">
+  <div class="wt">Clavier : cliquez sur les touches</div>
+  <div class="ctrl"><label><input type="checkbox" id="kbdPenta"> surligner la pentatonique (Do Ré Mi Sol La)</label>
+   Jouer la gamme : <button data-sc="maj">majeure</button><button data-sc="penta">pentatonique</button><button data-sc="chrom">chromatique</button></div>
+  <div id="kbd"></div>
+  <div id="kbdInfo" class="out">Cliquez sur une touche…</div>
+  <div id="kbdRatio" class="muted"></div>
+ </div>
+ <h3>Table des fréquences (Hz) de la gamme tempérée</h3>
+ <div id="freqTable"></div>
+
+ <div class="q"><label>5.1 Cliquez sur Do3 puis Do4, puis sur Do3 et Sol3. Quels rapports de fréquences obtenez-vous ?</label><textarea data-key="q5_1"></textarea></div>
+ <div class="q"><label>5.2 Le Do4 est 3 demi-tons au-dessus du La3. Calculez sa fréquence avec la formule en détaillant le calcul, puis vérifiez dans la table.</label><textarea data-key="q5_2"></textarea></div>
+ <div class="q"><label>5.3 Un tube donne 452 Hz alors qu'on visait un La3. Calculez l'écart en %. La note est-elle trop haute ou trop basse ? Est-ce acceptable ?</label><textarea data-key="q5_3"></textarea></div>
+ <div class="q"><label>5.4 Pourquoi la gamme pentatonique est-elle un bon choix pour votre instrument ? Quelle(s) gamme(s) envisagez-vous ?</label><textarea data-key="q5_4"></textarea></div>
+
+ <div class="qcm" data-key="qcm5" data-answer="c" data-explain="L'octave correspond à un rapport de fréquences égal à 2.">
+  <p class="qq">Auto-test : pour monter une note d'une octave, on…</p>
+  <label><input type="radio" name="qcm5" value="a"> ajoute 440 Hz</label>
+  <label><input type="radio" name="qcm5" value="b"> multiplie la fréquence par 1,0595</label>
+  <label><input type="radio" name="qcm5" value="c"> multiplie la fréquence par 2</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+</section>
+
+<!-- ============ 6 TUBES ============ -->
+<section id="s6">
+ <h2>6 · Les tubes</h2>
+ <p>Dans un tube, ce n'est pas le PVC qui donne la note : c'est la <b>colonne d'air</b> à l'intérieur. Une onde sonore stationnaire s'y installe. Le matériau du tube agit surtout sur le timbre et la façon dont le son rayonne, très peu sur la hauteur.</p>
+ <h3>Ce qui se passe aux extrémités</h3>
+ <ul>
+  <li><b>Extrémité ouverte</b> : l'air peut bouger librement, il y a un <b>ventre</b> de vibration.</li>
+  <li><b>Extrémité fermée</b> (bouchon, paume, fond) : l'air est bloqué, il y a un <b>nœud</b>.</li>
+ </ul>
+ <div class="grid2">
+  <div class="box blue"><b>Ouvert aux deux bouts</b> (V … V)<br>L = n × λ/2<div class="formula" style="font-size:18px">f₁ = v / (2L)</div>Il produit <b>toutes</b> les harmoniques : f₁, 2f₁, 3f₁…</div>
+  <div class="box"><b>Fermé à un bout</b> (N … V)<br>L = λ/4 pour le fondamental<div class="formula" style="font-size:18px">f₁ = v / (4L)</div>Il produit seulement les harmoniques <b>impaires</b> : f₁, 3f₁, 5f₁…</div>
+ </div>
+ <div class="box green">À longueur égale, un tube <b>fermé</b> sonne <b>une octave plus bas</b> qu'un tube ouvert. Autrement dit, pour une même note, il est <b>deux fois plus court</b> : moins de matière, moins de place. Son timbre est plus « creux », plus doux.</div>
+ <h3>La correction d'extrémité</h3>
+ <p>À une extrémité ouverte, la vibration déborde un peu hors du tube : tout se passe comme si le tube était légèrement plus long. Pour un tube de rayon intérieur r, on ajoute environ <b>0,6 × r par extrémité ouverte</b>. Sans cette correction, les tubes sonnent trop bas, surtout ceux de gros diamètre.</p>
+ <h3>Comment faire sonner un tube ?</h3>
+ <ul>
+  <li><b>Souffler en biseau</b> sur le bord, comme dans une bouteille : c'est la flûte de Pan, faite de tubes fermés.</li>
+  <li><b>Frapper l'extrémité ouverte</b> avec la paume ou une « tapette » souple : une semelle de tong, une raquette en mousse…</li>
+  <li>Frapper le tube sur le côté fait surtout vibrer le PVC lui-même : le son est plus sourd.</li>
+ </ul>
+
+ <div class="widget">
+  <div class="wt">Simulateur de tube</div>
+  <div class="ctrl">
+   <select id="tubeType"><option value="oo">Ouvert aux deux bouts</option><option value="fo">Fermé à gauche, ouvert à droite</option></select>
+   <span id="tubeModes">Mode : <button data-n="1" class="on">1</button><button data-n="2">2</button><button data-n="3">3</button></span>
+  </div>
+  <div class="ctrl">
+   <label>Longueur L <input type="range" id="tubeL" min="10" max="200" step="0.5" value="50" style="width:220px"> <span id="tubeLv" class="out"></span></label>
+   <label>Diamètre intérieur (mm) <input type="number" id="tubeD" value="36" min="5" max="150"></label>
+   <label>Température (°C) <input type="number" id="tubeT" value="20" min="-10" max="40"></label>
+   <button class="primary" id="tubePlay">🔊 Écouter (fondamental)</button>
+  </div>
+  <canvas id="cvTube"></canvas>
+  <div id="tubeOut" class="out" style="margin-top:6px"></div>
+  <p class="muted">Les points représentent l'air dans le tube. La courbe du haut montre l'amplitude de vibration de l'air le long du tube. Le son est une synthèse approchée.</p>
+ </div>
+
+ <div class="q"><label>6.1 Avec l'animation, justifiez la présence d'un ventre à une extrémité ouverte et d'un nœud à une extrémité fermée.</label><textarea data-key="q6_1"></textarea></div>
+ <div class="q"><label>6.2 Réglez L = 50 cm. Relevez f₁ pour le tube ouvert, puis pour le tube fermé. Calculez le rapport. Est-ce cohérent avec le cours ?</label><textarea data-key="q6_2"></textarea></div>
+ <div class="q"><label>6.3 Calculez à la main la longueur d'un tube fermé qui donne le Do3 (261,6 Hz) à 20 °C : d'abord sans correction, puis avec la correction pour un diamètre intérieur de 36 mm. Vérifiez avec le simulateur.</label><textarea data-key="q6_3"></textarea></div>
+ <div class="q"><label>6.4 Expérience : frappez l'extrémité d'un tube avec la paume qui <i>reste plaquée</i>, puis avec une tapette qui <i>rebondit</i>. Mesurez les deux fréquences. Laquelle correspond à un tube fermé, laquelle à un tube ouvert ? Justifiez.</label><textarea data-key="q6_4"></textarea></div>
+
+ <div class="qcm" data-key="qcm6" data-answer="b" data-explain="f = v/(4L) au lieu de v/(2L) : la fréquence est divisée par 2, donc le son est une octave plus bas.">
+  <p class="qq">Auto-test : on bouche un bout d'un tube ouvert. Sa note…</p>
+  <label><input type="radio" name="qcm6" value="a"> monte d'une octave</label>
+  <label><input type="radio" name="qcm6" value="b"> descend d'une octave</label>
+  <label><input type="radio" name="qcm6" value="c"> ne change pas</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+
+ <div class="sketch" data-key="sk6" data-tpl="tubes" data-h="480" data-title="Croquis 3 : dans chaque tube, dessinez l'amplitude de vibration de l'air pour le mode fondamental. Placez N et V et indiquez quelle fraction de λ tient dans L."></div>
+</section>
+
+<!-- ============ 7 LAMES ============ -->
+<section id="s7">
+ <h2>7 · Les lames et les lattes</h2>
+ <p>Ici, c'est le <b>solide lui-même</b> qui vibre : la lame fléchit. Pour une lame posée librement, extrémités libres, le mode fondamental présente <b>deux nœuds</b> situés à <b>22,4 % de la longueur</b> en partant de chaque bout. Le centre et les deux extrémités sont des ventres.</p>
+ <div class="box warn"><b>Une lame ne se pose pas n'importe comment.</b> Un support placé là où la lame bouge freine la vibration : il absorbe son énergie et le son devient bref et sourd. Placé exactement sur un <b>nœud</b>, là où la lame ne bouge pas, le support ne prélève presque pas d'énergie, et la lame sonne longtemps.</div>
+ <p>Quelques solutions pratiques :</p>
+ <ul>
+  <li>Bandes de <b>mousse isolante</b> (joint de fenêtre) collées sous les nœuds.</li>
+  <li>Un trou percé <b>au nœud</b>, avec une vis et une rondelle souple, <b>sans serrer</b>.</li>
+  <li>Une cordelette passée sous les nœuds.</li>
+ </ul>
+
+ <h3>Fréquence d'une lame</h3>
+ <div class="formula">f₁ ≈ 1,03 × e × √(E/ρ) / L²</div>
+ <p class="muted">e : épaisseur (m) ; L : longueur (m) ; √(E/ρ) : vitesse du son dans le matériau (partie 2). Formule valable pour un <b>plat</b> rectangulaire, pas pour une cornière ni un tube.</p>
+ <ul>
+  <li>La <b>largeur</b> n'intervient presque pas.</li>
+  <li>Doubler l'<b>épaisseur</b> double la fréquence.</li>
+  <li>Doubler la <b>longueur</b> divise la fréquence par <b>4</b>. Pour descendre d'une octave, on multiplie donc la longueur par √2 ≈ 1,41.</li>
+  <li>L'aluminium et l'acier ont presque le même √(E/ρ) : à dimensions égales, ils donnent presque la même note, mais pas le même timbre.</li>
+  <li>Pour le <b>bois</b>, √(E/ρ) varie selon l'essence, l'humidité et les nœuds. Les fibres doivent être dans le sens de la longueur. Il faut <b>mesurer</b> et non deviner (voir l'outil « caractériser son matériau » plus bas).</li>
+ </ul>
+ <p>Les partiels d'une lame sont à environ <b>2,76 f₁</b> et <b>5,40 f₁</b> : ils ne sont pas harmoniques, d'où le son « métallique » ou « cloche ». Les fabricants de marimbas creusent un arc sous chaque lame pour ramener ce partiel à 4 f₁ : le son devient plus chaud.</p>
+
+ <div class="widget">
+  <div class="wt">Simulateur de lame : déplacez les supports (triangles) à la souris, puis écoutez</div>
+  <div class="ctrl">
+   <label>Matériau <select id="barMat">
+    <option value="5060" data-k="metal">Aluminium</option><option value="5170" data-k="metal">Acier</option>
+    <option value="4470" data-k="bois">Bois résineux (pin, sapin)</option><option value="4140" data-k="bois">Bois dur (chêne)</option></select></label>
+   <label>Épaisseur e (mm) <input type="number" id="barE" value="2" step="0.5" min="0.5" max="40"></label>
+   <label>Longueur L <input type="range" id="barL" min="5" max="100" step="0.5" value="30" style="width:200px"> <span id="barLv" class="out"></span></label>
+  </div>
+  <div class="ctrl">
+   <span id="barModes">Mode affiché : <button data-m="0" class="on">1</button><button data-m="1">2</button><button data-m="2">3</button></span>
+   <label><input type="checkbox" id="barSym" checked> supports symétriques</label>
+   <button id="barNodes">Supports aux nœuds</button><button id="barEnds">Supports aux bouts</button>
+   <button class="primary" id="barPlay">🔨 Frapper</button>
+  </div>
+  <canvas id="cvBar"></canvas>
+  <div id="barOut" class="out" style="margin-top:6px"></div>
+ </div>
+
+ <h3>Accorder une lame</h3>
+ <table>
+  <tr><th>Pour…</th><th>On…</th></tr>
+  <tr><td>monter la note (plus aigu)</td><td><b>raccourcit</b> la lame (scier les bouts) ou amincit près des extrémités</td></tr>
+  <tr><td>descendre la note (plus grave)</td><td><b>amincit le centre</b> par-dessous (lime, ponçage)</td></tr>
+ </table>
+ <div class="box green">Coupez toujours <b>2 à 3 % plus long</b> que la longueur calculée, puis raccourcissez progressivement en mesurant avec l'analyseur. On peut toujours raccourcir, jamais rallonger.</div>
+ <p>Le choix de la <b>mailloche</b> compte aussi. Une tête dure (bois, plastique) fait ressortir les aigus et donne un son brillant. Une tête souple (caoutchouc, feutre, balle) donne un son doux.</p>
+
+ <div class="widget">
+  <div class="wt">Outil : caractériser son matériau à partir d'une lame d'essai</div>
+  <div class="ctrl">
+   <label>L (cm) <input type="number" id="carL" value="30" step="0.1"></label>
+   <label>e (mm) <input type="number" id="carE" value="10" step="0.1"></label>
+   <label>largeur b (mm) <input type="number" id="carB" value="40" step="0.1"></label>
+   <label>masse (g) <input type="number" id="carM" value="" step="0.1" placeholder="facultatif"></label>
+   <label>f₁ mesurée (Hz) <input type="number" id="carF" value="" step="0.1"></label>
+  </div>
+  <div id="carOut" class="out"></div>
+  <p class="muted">√(E/ρ) = f₁ × L² / (1,03 × e). Si vous pesez la lame, on en déduit ρ = m / (L × b × e), puis E = ρ × (√(E/ρ))². Vous pourrez reporter cette valeur dans le calculateur de la partie 8.</p>
+ </div>
+
+ <div class="q"><label>7.1 Dans le simulateur, placez les supports aux bouts, puis aux nœuds, et frappez à chaque fois. Décrivez la différence et expliquez-la en termes d'énergie.</label><textarea data-key="q7_1"></textarea></div>
+ <div class="q"><label>7.2 Avec le simulateur, doublez L : que devient f₁ ? Revenez à la longueur de départ et doublez e : que devient f₁ ? Comparez avec la formule.</label><textarea data-key="q7_2"></textarea></div>
+ <div class="q"><label>7.3 Expérience : tenez une lame entre deux doigts à différents endroits, frappez-la et cherchez le point où elle sonne le plus longtemps. Mesurez sa distance au bout et divisez par L. Comparez à 22,4 %.</label><textarea data-key="q7_3"></textarea></div>
+ <div class="q"><label>7.4 Caractérisez votre matériau (outil ci-dessus) à partir d'une lame ou d'une latte d'essai. Comparez avec le tableau de la partie 2 et commentez.</label><textarea data-key="q7_4"></textarea></div>
+ <div class="q"><label>7.5 Pourquoi une lame et un tube qui jouent la même note ne sonnent-ils pas pareil ?</label><textarea data-key="q7_5"></textarea></div>
+
+ <div class="qcm" data-key="qcm7" data-answer="c" data-explain="f est proportionnelle à 1/L² : doubler L divise f par 2² = 4, soit deux octaves plus bas.">
+  <p class="qq">Auto-test : on double la longueur d'une lame (même épaisseur). Sa fréquence est…</p>
+  <label><input type="radio" name="qcm7" value="a"> divisée par 2</label>
+  <label><input type="radio" name="qcm7" value="b"> multipliée par 2</label>
+  <label><input type="radio" name="qcm7" value="c"> divisée par 4</label>
+  <button class="qcm-check">Vérifier</button><div class="fb"></div>
+ </div>
+
+ <div class="sketch" data-key="sk7" data-tpl="lame" data-h="420" data-title="Croquis 4 : dessinez la lame en vibration (mode fondamental). Placez les nœuds, les supports et l'endroit où frapper."></div>
+</section>
+
+<!-- ============ 8 CONCEPTION ============ -->
+<section id="s8">
+ <h2>8 · Concevoir son instrument</h2>
+ <p>À vous de décider. Pensez en designer <i>et</i> en physicien :</p>
+ <ul>
+  <li><b>Le résonateur</b> : tubes ouverts, tubes fermés, lames de métal ou lattes de bois.</li>
+  <li><b>La gamme</b> : laquelle, à partir de quelle note, combien de notes.</li>
+  <li><b>Le jeu</b> : frapper, souffler, avec quoi ; debout, assis, à plusieurs ?</li>
+  <li><b>La structure</b> : comment tenir chaque élément <b>sans l'étouffer</b>, en le maintenant aux nœuds.</li>
+  <li><b>L'objet</b> : ergonomie, transport, esthétique, assemblage avec la visseuse, matière restante.</li>
+ </ul>
+
+ <div class="widget">
+  <div class="wt">Calculateur de dimensions</div>
+  <div class="ctrl">
+   <label>Type <select id="calcType" data-key="calcType">
+    <option value="tube_f">Tubes fermés à un bout</option><option value="tube_o">Tubes ouverts aux deux bouts</option><option value="lame">Lames ou lattes (plat)</option></select></label>
+   <label>Gamme <select id="calcScale" data-key="calcScale">
+    <option value="penta">Pentatonique majeure (Do Ré Mi Sol La)</option><option value="maj">Majeure (Do Ré Mi Fa Sol La Si)</option>
+    <option value="minp">Pentatonique mineure</option><option value="chrom">Chromatique (tous les demi-tons)</option></select></label>
+  </div>
+  <div class="ctrl">
+   <label>Première note <select id="calcNote" data-key="calcNote"></select></label>
+   <label>Octave <select id="calcOct" data-key="calcOct"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+   <label>Nombre de notes <input type="number" id="calcN" data-key="calcN" value="6" min="1" max="24"></label>
+   <label><input type="checkbox" id="calcMarge" data-key="calcMarge" checked> marge de +2 % pour accorder</label>
+  </div>
+  <div class="ctrl" id="calcTubeP">
+   <label>Diamètre intérieur (mm) <input type="number" id="calcD" data-key="calcD" value="36"></label>
+   <label>Température (°C) <input type="number" id="calcTemp" data-key="calcTemp" value="20"></label>
+  </div>
+  <div class="ctrl" id="calcLameP">
+   <label>Matériau <select id="calcMat" data-key="calcMat">
+    <option value="5060">Aluminium (5060 m/s)</option><option value="5170">Acier (5170 m/s)</option>
+    <option value="4470">Bois résineux (≈ 4470 m/s)</option><option value="4140">Bois dur (≈ 4140 m/s)</option><option value="custom">Valeur mesurée…</option></select></label>
+   <label id="calcCwrap">√(E/ρ) mesuré (m/s) <input type="number" id="calcC" data-key="calcC" value="4500"></label>
+   <label>Épaisseur (mm) <input type="number" id="calcE" data-key="calcE" value="2" step="0.1"></label>
+  </div>
+  <div id="calcOut"></div>
+  <div class="report-block" data-type="calc"></div>
+ </div>
+ <p class="muted">Diamètres intérieurs usuels du PVC d'évacuation : environ 29 mm pour le Ø 32, 36 mm pour le Ø 40, 46 mm pour le Ø 50 et 96 mm pour le Ø 100. <b>Mesurez vos tubes</b> pour en être sûrs.</p>
+
+ <div class="box">
+  <b>Conseils d'atelier</b>
+  <ul style="margin:6px 0 0">
+   <li>Tracez les coupes au réglet et à l'équerre, sciez bien droit. Pour les tubes, enroulez une bande de papier autour du tube pour tracer un trait bien perpendiculaire.</li>
+   <li><b>Ébavurez</b> les lames métalliques après sciage (lime, papier abrasif) : les arêtes coupent.</li>
+   <li>Repérez les nœuds (22,4 % de L) au marqueur <b>avant</b> de percer ou de coller la mousse.</li>
+   <li>Des lames de longueurs différentes ont des nœuds à des distances différentes. Les deux rails de support forment donc un <b>trapèze</b>, comme sur un xylophone.</li>
+   <li>Ne serrez jamais une lame à bloc : elle doit pouvoir vibrer.</li>
+   <li><b>Pour aller plus loin</b> : placez un tube fermé sous chaque lame, accordé sur la même note (L ≈ v / 4f). Il agit comme un résonateur et amplifie le son, comme sur un marimba. Cela combine les deux familles étudiées.</li>
+  </ul>
+ </div>
+
+ <div class="q"><label>8.1 Décrivez votre projet : type d'instrument, matériaux, nombre de notes, gamme, mode de jeu.</label><textarea data-key="q8_1"></textarea></div>
+ <div class="q"><label>8.2 Justifiez vos choix (matériau, gamme, tubes ouverts ou fermés…) en vous appuyant sur les parties précédentes.</label><textarea data-key="q8_2"></textarea></div>
+ <div class="q"><label>8.3 Comment allez-vous maintenir les lames ou les tubes ? Justifiez avec la notion de nœud.</label><textarea data-key="q8_3"></textarea></div>
+ <div class="q"><label>8.4 Listez les matériaux, la quantité de matière nécessaire (voir le calculateur) et les étapes de fabrication.</label><textarea data-key="q8_4"></textarea></div>
+
+ <div class="sketch" data-key="sk8a" data-tpl="grille" data-h="560" data-title="Croquis 5 : croquis d'intention de votre instrument (allure générale, position du joueur, ambiance)."></div>
+ <div class="sketch" data-key="sk8b" data-tpl="grille" data-h="560" data-title="Croquis 6 : croquis technique coté (vues, cotes principales, position des nœuds, principe de fixation)."></div>
+</section>
+
+<!-- ============ 9 JOURNAL ============ -->
+<section id="s9">
+ <h2>9 · Journal d'expériences</h2>
+ <p>Pour chaque essai : <b>prévoyez</b> la fréquence (calculateur ou simulateur), <b>mesurez</b>-la (analyseur), puis <b>comparez</b>. L'écart est calculé automatiquement :</p>
+ <div class="formula">écart (%) = (f mesurée − f prévue) / f prévue × 100</div>
+ <div class="widget">
+  <table id="journalTable">
+   <thead><tr><th style="width:95px">Date</th><th>Objet / matériau</th><th>Dimensions (L, e ou Ø…)</th><th style="width:85px">f prévue (Hz)</th><th style="width:85px">f mesurée (Hz)</th><th style="width:70px">Écart</th><th>Observations / action</th><th></th></tr></thead>
+   <tbody></tbody>
+  </table>
+  <button id="journalAdd">➕ Ajouter une ligne</button>
+  <div class="report-block" data-type="journal"></div>
+ </div>
+
+ <h3>Photos de vos essais et de votre objet</h3>
+ <p class="muted">8 photos au maximum. Elles sont réduites automatiquement pour la sauvegarde.</p>
+ <input type="file" id="photoInput" accept="image/*" multiple>
+ <div id="photoGrid"></div>
+ <div class="report-block" data-type="photos"></div>
+
+ <div class="q"><label>9.1 Analysez vos écarts. D'où peuvent-ils venir ? Pensez à la température, à l'épaisseur réelle, à la qualité du bois, à la correction d'extrémité, à la précision de la mesure…</label><textarea data-key="q9_1"></textarea></div>
+ <div class="q"><label>9.2 Comment avez-vous accordé vos éléments ? Décrivez la démarche et le résultat obtenu.</label><textarea data-key="q9_2"></textarea></div>
+</section>
+
+<!-- ============ 10 RECHERCHES ============ -->
+<section id="s10">
+ <h2>10 · Recherches documentaires</h2>
+ <p>Complétez ce document par vos propres recherches : <b>au moins 4 sources</b>, dont une au moins sur un <b>designer, un artiste ou un facteur d'instruments</b>.</p>
+ <div class="box blue">
+  <b>Pistes de mots-clés</b> : onde stationnaire tube ouvert fermé · vibration lame libre nœuds 0,224 · fabrication xylophone · résonateur marimba · gamme pentatonique · tempérament égal · lithophone · gamelan · instruments en PVC.<br>
+  <b>Créateurs à découvrir</b> : les frères Baschet (Structures sonores), Harry Bertoia (sculptures sonores), Harry Partch (instruments inventés)…
+ </div>
+ <p><b>Évaluer une source</b> : qui en est l'auteur et quelle est sa compétence ? De quand date-t-elle ? Est-ce un site institutionnel, un musée, une encyclopédie, un blog, une vidéo ? L'information est-elle confirmée par une autre source ?</p>
+ <div id="sourcesList"></div>
+ <button id="srcAdd">➕ Ajouter une source</button>
+ <div class="report-block" data-type="sources"></div>
+
+ <div class="q"><label>10.1 Qu'est-ce que vos sources vous ont apporté que ce document ne disait pas ? Y a-t-il des contradictions entre elles ?</label><textarea data-key="q10_1"></textarea></div>
+ <div class="q"><label>10.2 Analysez un objet sonore créé par un designer ou un artiste : matériaux, principe physique (tube, lame, autre), mode de jeu, ce qui vous inspire pour votre projet.</label><textarea data-key="q10_2"></textarea></div>
+</section>
+
+<!-- ============ 11 SYNTHESE ============ -->
+<section id="s11">
+ <h2>11 · Synthèse personnelle</h2>
+ <p>Rédigez avec vos propres mots, sans copier-coller. Cette synthèse est individuelle.</p>
+ <div class="q"><label>11.1 Ce que j'ai compris : expliquez 3 à 5 notions clés (onde stationnaire, nœud, fréquence propre, timbre, gamme…) comme à quelqu'un qui ne les connaît pas.</label><textarea data-key="q11_1" style="min-height:140px"></textarea></div>
+ <div class="q"><label>11.2 Physique et conception : en quoi ces notions ont-elles guidé nos choix de forme, de dimensions, de matériaux et de fixation ?</label><textarea data-key="q11_2" style="min-height:140px"></textarea></div>
+ <div class="q"><label>11.3 Bilan de l'objet : ce qui fonctionne, ce qui ne fonctionne pas, ce que nous améliorerions.</label><textarea data-key="q11_3" style="min-height:140px"></textarea></div>
+ <div class="q"><label>11.4 Mon regard de designer : qu'ai-je appris sur la matière et le son ? Comment pourrais-je réutiliser cela dans d'autres projets ?</label><textarea data-key="q11_4" style="min-height:140px"></textarea></div>
+ <p style="text-align:center;margin-top:24px"><button class="primary" id="btnPdf2" style="font-size:17px;padding:10px 22px">📄 Générer mon PDF</button></p>
+</section>
+
+</main>
+
+<div id="report"></div>
+
+<script>
+/* ================= Utilitaires & sauvegarde ================= */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const KEY='esaat_dnmade_son_v1';
+const state={fields:{},sketches:{},journal:[],sources:[],photos:[],qcm:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) Object.assign(state,s);}catch(e){}
+let tSave=null;
+function setStatus(m,bad){const el=$('#saveStatus'); if(el){el.textContent=m; el.style.color=bad?'#ff9b9b':'#9fd99f';}}
+function save(){clearTimeout(tSave); setStatus('…'); tSave=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state)); setStatus('Enregistré ✓');}catch(e){setStatus('⚠ Mémoire pleine : exportez (.json) et retirez des photos',true);}},400);}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=(x,d=1)=>Number.isFinite(x)?x.toFixed(d).replace('.',','):'—';
+const num=v=>parseFloat(String(v).replace(',','.'));
+
+/* ================= Notes ================= */
+const NOTES=['Do','Do#','Ré','Ré#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si'];
+function freqNote(idx,oct){return 440*Math.pow(2,((oct-3)*12+idx-9)/12);}
+function nearest(f){const n=12*Math.log2(f/440), r=Math.round(n); const idx=((r+9)%12+12)%12, oct=Math.floor((r+9)/12)+3; const fr=440*Math.pow(2,r/12); return {name:NOTES[idx]+oct,fr,ecart:(f/fr-1)*100};}
+function noteTxt(f){if(!(f>0)) return '—'; const n=nearest(f); return `${n.name} (${fmt(n.fr,1)} Hz, écart ${n.ecart>=0?'+':''}${fmt(n.ecart,1)} %)`;}
+
+/* ================= Audio ================= */
+let AC=null;
+function ac(){if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC;}
+function strike(parts,vol=0.35){const c=ac(), t0=c.currentTime+0.01; const sum=parts.reduce((s,p)=>s+p.a,0)||1;
+ const m=c.createGain(); m.gain.value=vol/sum; m.connect(c.destination);
+ parts.forEach(p=>{if(p.f<20||p.f>16000||p.a<=0) return; const o=c.createOscillator(), g=c.createGain(); o.frequency.value=p.f;
+  g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(p.a,t0+0.004); g.gain.setTargetAtTime(0.0001,t0+0.004,p.tau);
+  o.connect(g); g.connect(m); o.start(t0); o.stop(t0+0.02+p.tau*6);});}
+function blow(parts,dur=1.5,vol=0.3){const c=ac(), t0=c.currentTime+0.01; const sum=parts.reduce((s,p)=>s+p.a,0)||1;
+ const m=c.createGain(); m.gain.setValueAtTime(0,t0); m.gain.linearRampToValueAtTime(vol/sum,t0+0.07); m.gain.setValueAtTime(vol/sum,t0+dur-0.25); m.gain.linearRampToValueAtTime(0,t0+dur); m.connect(c.destination);
+ parts.forEach(p=>{if(p.f<20||p.f>16000||p.a<=0) return; const o=c.createOscillator(), g=c.createGain(); o.frequency.value=p.f; g.gain.value=p.a; o.connect(g); g.connect(m); o.start(t0); o.stop(t0+dur+0.05);});}
+
+/* ================= Moteur d'animation ================= */
+const anims=[];
+const io=('IntersectionObserver' in window)?new IntersectionObserver(es=>es.forEach(e=>{const a=anims.find(x=>x.canvas===e.target); if(a) a.vis=e.isIntersecting;})):null;
+function fit(a){const dpr=window.devicePixelRatio||1; const w=a.canvas.clientWidth||800; a.canvas.width=Math.round(w*dpr); a.canvas.height=Math.round(a.h*dpr); a.canvas.style.height=a.h+'px'; a.w=w; a.ctx=a.canvas.getContext('2d'); a.ctx.setTransform(dpr,0,0,dpr,0,0);}
+function addAnim(canvas,h,draw){const a={canvas,h,draw,vis:!io}; anims.push(a); fit(a); if(io) io.observe(canvas); return a;}
+window.addEventListener('resize',()=>anims.forEach(fit));
+function loop(ts){const t=ts/1000; anims.forEach(a=>{if(a.vis){try{a.ctx.clearRect(0,0,a.w,a.h); a.draw(a.ctx,a.w,a.h,t);}catch(e){console.error(e);}}}); requestAnimationFrame(loop);}
+function arrow(ctx,x1,y1,x2,y2,col='#555'){ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); const a=Math.atan2(y2-y1,x2-x1); ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-9*Math.cos(a-0.4),y2-9*Math.sin(a-0.4)); ctx.lineTo(x2-9*Math.cos(a+0.4),y2-9*Math.sin(a+0.4)); ctx.fill();}
+function setOn(btns,pred){btns.forEach(b=>b.classList.toggle('on',pred(b)));}
+
+/* ================= Champs ================= */
+function bindFields(){
+ $$('[data-key]').forEach(el=>{
+  if(!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;
+  const k=el.dataset.key;
+  if(state.fields[k]!==undefined){ if(el.type==='checkbox') el.checked=!!state.fields[k]; else el.value=state.fields[k]; }
+  const upd=()=>{state.fields[k]=el.type==='checkbox'?el.checked:el.value; save();};
+  el.addEventListener('input',upd); el.addEventListener('change',upd);
+ });
+}
+
+/* ================= QCM ================= */
+function initQcm(){
+ $$('.qcm').forEach(q=>{
+  const k=q.dataset.key;
+  if(state.qcm[k]){const r=$(`input[value="${state.qcm[k]}"]`,q); if(r) r.checked=true;}
+  $$('input',q).forEach(r=>r.addEventListener('change',()=>{state.qcm[k]=r.value; save();}));
+  $('.qcm-check',q).onclick=()=>{const fb=$('.fb',q); const v=state.qcm[k];
+   if(!v){fb.className='fb bad'; fb.textContent='Choisissez une réponse.'; return;}
+   const ok=v===q.dataset.answer; fb.className='fb '+(ok?'ok':'bad'); fb.textContent=(ok?'✔ Exact. ':'✘ Pas tout à fait. ')+q.dataset.explain;};
+ });
+}
+
+/* ================= Croquis ================= */
+function drawTemplate(ctx,tpl,W,H){
+ ctx.save();
+ if(tpl==='grille'){ctx.strokeStyle='#f0ece6'; ctx.lineWidth=1; for(let x=0;x<=W;x+=25){ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();} for(let y=0;y<=H;y+=25){ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();}}
+ if(tpl==='corde'){ctx.fillStyle='#aaa'; ctx.font='18px system-ui'; [110,270,430].forEach((y,i)=>{ctx.fillText('mode '+(i+1),20,y-50); ctx.fillStyle='#888'; ctx.fillRect(90,y-40,10,80); ctx.fillRect(900,y-40,10,80); ctx.strokeStyle='#ccc'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(100,y); ctx.lineTo(900,y); ctx.stroke(); ctx.fillStyle='#aaa';});}
+ if(tpl==='tubes'){ctx.strokeStyle='#bbb'; ctx.lineWidth=4; ctx.fillStyle='#999'; ctx.font='18px system-ui';
+  [[120,'Tube ouvert aux deux extrémités',false],[340,'Tube fermé à gauche, ouvert à droite',true]].forEach(([y,t,cl])=>{ctx.fillText(t,100,y-60); ctx.beginPath(); ctx.moveTo(100,y-40); ctx.lineTo(900,y-40); ctx.moveTo(100,y+40); ctx.lineTo(900,y+40); ctx.stroke(); if(cl){ctx.fillStyle='#888'; ctx.fillRect(88,y-44,14,88); ctx.fillStyle='#999';}});}
+ if(tpl==='lame'){ctx.fillStyle='#eee'; ctx.strokeStyle='#bbb'; ctx.lineWidth=2; ctx.fillRect(100,200,800,26); ctx.strokeRect(100,200,800,26); ctx.fillStyle='#999'; ctx.font='15px system-ui'; for(let i=0;i<=10;i++){const x=100+80*i; ctx.beginPath(); ctx.moveTo(x,300); ctx.lineTo(x,312); ctx.stroke(); ctx.fillText((i*10)+' %',x-14,332);} ctx.beginPath(); ctx.moveTo(100,306); ctx.lineTo(900,306); ctx.stroke();}
+ ctx.restore();
+}
+function initSketch(el){
+ const key=el.dataset.key, W=1000, H=+el.dataset.h||500, tpl=el.dataset.tpl||'';
+ const cols=['#222','#c53030','#2b6cb0','#2f855a','#d69e2e'];
+ el.innerHTML=`<div class="sk-title">✏️ ${esc(el.dataset.title)}</div><div class="sk-bar">${cols.map((c,i)=>`<button class="sk-c${i?'':' on'}" data-c="${c}" style="background:${c}" title="Couleur"></button>`).join('')}
+  <select class="sk-size"><option value="2">trait fin</option><option value="4" selected>trait moyen</option><option value="9">trait épais</option></select>
+  <button class="sk-pen on">Stylo</button><button class="sk-eraser">Gomme</button><button class="sk-text">Texte</button><button class="sk-undo">↶ Annuler</button><button class="sk-clear">Effacer tout</button></div><canvas width="${W}" height="${H}"></canvas>`;
+ const cv=$('canvas',el), ctx=cv.getContext('2d'); let color='#222', size=4, tool='pen', drawing=false, last=null; const undo=[];
+ const bg=()=>{ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H); drawTemplate(ctx,tpl,W,H);};
+ bg();
+ if(state.sketches[key]){const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0,W,H); im.src=state.sketches[key];}
+ const pos=e=>{const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height];};
+ const push=()=>{try{undo.push(ctx.getImageData(0,0,W,H)); if(undo.length>20) undo.shift();}catch(e){}};
+ const store=()=>{state.sketches[key]=cv.toDataURL('image/png'); save();};
+ const tools=$$('.sk-pen,.sk-eraser,.sk-text',el);
+ const setTool=t=>{tool=t; setOn(tools,b=>b.classList.contains('sk-'+t));};
+ $$('.sk-c',el).forEach(b=>b.onclick=()=>{color=b.dataset.c; setOn($$('.sk-c',el),x=>x===b); if(tool==='eraser') setTool('pen');});
+ $('.sk-size',el).onchange=e=>size=+e.target.value;
+ $('.sk-pen',el).onclick=()=>setTool('pen'); $('.sk-eraser',el).onclick=()=>setTool('eraser'); $('.sk-text',el).onclick=()=>setTool('text');
+ $('.sk-undo',el).onclick=()=>{const d=undo.pop(); if(d){ctx.putImageData(d,0,0); store();}};
+ $('.sk-clear',el).onclick=()=>{if(confirm('Effacer tout le croquis ?')){push(); bg(); delete state.sketches[key]; save();}};
+ cv.addEventListener('pointerdown',e=>{const p=pos(e); push();
+  if(tool==='text'){const t=prompt('Texte à écrire :'); if(t){ctx.fillStyle=color; ctx.font=`${14+size*3}px system-ui`; ctx.fillText(t,p[0],p[1]); store();} else undo.pop(); return;}
+  drawing=true; last=p; try{cv.setPointerCapture(e.pointerId);}catch(_){}
+  const er=tool==='eraser'; ctx.fillStyle=er?'#fff':color; ctx.beginPath(); ctx.arc(p[0],p[1],(er?size*5:size)/2,0,7); ctx.fill();});
+ cv.addEventListener('pointermove',e=>{if(!drawing) return; const p=pos(e), er=tool==='eraser'; ctx.strokeStyle=er?'#fff':color; ctx.lineWidth=er?size*5:size; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.beginPath(); ctx.moveTo(last[0],last[1]); ctx.lineTo(p[0],p[1]); ctx.stroke(); last=p;});
+ const end=()=>{if(drawing){drawing=false; store();}};
+ cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end); cv.addEventListener('pointerleave',end);
+}
+
+/* ================= 1. Ondes ================= */
+function initOnde(){
+ const cv=$('#cvOnde'); let type='T', mode='cont', f=0.6, tP=-99, now=0; const v=140;
+ const jit=[]; for(let i=0;i<64*7;i++) jit.push([(Math.random()-0.5)*5,(Math.random()-0.5)*8]);
+ const upd=()=>{$('#ondeT').classList.toggle('on',type==='T'); $('#ondeL').classList.toggle('on',type==='L'); $('#ondeCont').classList.toggle('on',mode==='cont'); $('#ondePulse').classList.toggle('on',mode==='pulse');};
+ $('#ondeT').onclick=()=>{type='T';upd();}; $('#ondeL').onclick=()=>{type='L';upd();};
+ $('#ondeCont').onclick=()=>{mode='cont';upd();}; $('#ondePulse').onclick=()=>{mode='pulse'; tP=now; upd();};
+ $('#ondeF').oninput=e=>{f=+e.target.value; $('#ondeFv').textContent=fmt(f,1);}; upd();
+ addAnim(cv,230,(ctx,w,h,t)=>{now=t; const x0=60, x1=w-20;
+  const s=tt=>mode==='cont'?Math.sin(2*Math.PI*f*tt):Math.exp(-Math.pow((tt-tP-0.3)/0.13,2));
+  ctx.fillStyle='#8a6d3b'; ctx.fillRect(4,h/2-25,46,50); ctx.fillStyle='#fff'; ctx.font='11px system-ui'; ctx.fillText('source',9,h/2+4);
+  arrow(ctx,w-170,22,w-40,22,'#888'); ctx.fillStyle='#666'; ctx.font='13px system-ui'; ctx.fillText('propagation',w-160,16);
+  if(type==='T'){const N=48, y0=h/2+12, A=45, pts=[];
+   for(let i=0;i<N;i++){const x=x0+(x1-x0)*i/(N-1); pts.push([x,y0-A*s(t-(x-x0)/v)]);}
+   ctx.strokeStyle='#bbb'; ctx.lineWidth=2; ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+   const xr=pts[20][0]; ctx.setLineDash([4,4]); ctx.strokeStyle='#e8a0a0'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(xr,y0-A-12); ctx.lineTo(xr,y0+A+12); ctx.stroke(); ctx.setLineDash([]);
+   pts.forEach((p,i)=>{ctx.fillStyle=i===20?'#c53030':'#2b6cb0'; ctx.beginPath(); ctx.arc(p[0],p[1],i===20?6:4,0,7); ctx.fill();});
+  } else {const N=64, rows=7, A=13, yTop=h/2-40;
+   for(let i=0;i<N;i++){const xe=x0+(x1-x0)*i/(N-1), d=A*s(t-(xe-x0)/v);
+    for(let r=0;r<rows;r++){const j=jit[i*rows+r]; ctx.fillStyle=i===26?'#c53030':'#2b6cb0'; ctx.beginPath(); ctx.arc(xe+d+j[0],yTop+r*14+j[1],i===26?4:3,0,7); ctx.fill();}}
+   const xe=x0+(x1-x0)*26/(N-1); ctx.strokeStyle='#e8a0a0'; ctx.setLineDash([4,4]); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(xe-A,yTop-14); ctx.lineTo(xe-A,yTop+rows*14); ctx.moveTo(xe+A,yTop-14); ctx.lineTo(xe+A,yTop+rows*14); ctx.stroke(); ctx.setLineDash([]);
+  }
+  if(mode==='cont'){const lam=v/f; if(x0+lam<x1){const y=h-18; ctx.strokeStyle='#444'; arrow(ctx,x0+lam/2,y,x0,y,'#444'); arrow(ctx,x0+lam/2,y,x0+lam,y,'#444'); ctx.fillStyle='#000'; ctx.font='bold 15px system-ui'; ctx.fillText('λ',x0+lam/2-4,y-6);}}
+ });
+}
+
+/* ================= 2. Course ================= */
+function initRace(){
+ const cv=$('#cvRace'); let t0=null, now=0;
+ const lanes=[['Air (20 °C)',343,'#d69e2e'],['Eau',1480,'#3182ce'],['Bois (pin, fibres)',4470,'#8b5a2b'],['Acier (barre)',5170,'#4a5568'],['Vide',0,'#aaa']];
+ $('#raceGo').onclick=()=>{t0=now;};
+ addAnim(cv,250,(ctx,w,h,t)=>{now=t; const xs=150, xe=w-30, D=100, slow=20;
+  ctx.font='13px system-ui'; ctx.fillStyle='#777'; ctx.fillText('0 m',xs-8,16); ctx.fillText('100 m',xe-30,16);
+  lanes.forEach((L,i)=>{const y=40+i*44; ctx.fillStyle='#333'; ctx.fillText(L[0],8,y+5);
+   ctx.strokeStyle='#eee'; ctx.lineWidth=14; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(xs,y); ctx.lineTo(xe,y); ctx.stroke();
+   let frac=0, txt='';
+   if(t0!==null){const tr=(t-t0)/slow; if(L[1]===0) txt='pas de propagation'; else {frac=Math.min(1,L[1]*tr/D); txt= frac>=1? 'arrivé en '+fmt(D/L[1]*1000,0)+' ms' : fmt(tr*1000,0)+' ms';}}
+   const x=xs+(xe-xs)*frac; ctx.fillStyle=L[2]; ctx.beginPath(); ctx.arc(x,y,8,0,7); ctx.fill();
+   if(txt){ctx.fillStyle='#333'; ctx.fillText(txt,Math.min(Math.max(xs,x-40),xe-140),y-12);}
+  });
+ });
+}
+
+/* ================= 3a. Onde stationnaire ================= */
+function initStat(){
+ const cv=$('#cvStat'); let n=1, comp=false;
+ const bs=$$('#statModes button'); bs.forEach(b=>b.onclick=()=>{n=+b.dataset.n; setOn(bs,x=>x===b);});
+ $('#statComp').onchange=e=>comp=e.target.checked;
+ addAnim(cv,250,(ctx,w,h,t)=>{const x0=40,x1=w-40,L=x1-x0,y0=h/2,A=38,om=2*Math.PI*0.35,k=n*Math.PI/L;
+  ctx.fillStyle='#666'; ctx.fillRect(x0-12,y0-70,10,140); ctx.fillRect(x1+2,y0-70,10,140);
+  ctx.setLineDash([4,4]); ctx.strokeStyle='#ccc'; ctx.lineWidth=1;
+  [1,-1].forEach(sg=>{ctx.beginPath(); for(let x=0;x<=L;x+=2){const y=y0-sg*2*A*Math.sin(k*x); x?ctx.lineTo(x0+x,y):ctx.moveTo(x0+x,y);} ctx.stroke();}); ctx.setLineDash([]);
+  const line=(fn,col,lw)=>{ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.beginPath(); for(let x=0;x<=L;x+=2){const y=y0-fn(x); x?ctx.lineTo(x0+x,y):ctx.moveTo(x0+x,y);} ctx.stroke();};
+  if(comp){line(x=>A*Math.sin(k*x-om*t),'rgba(43,108,176,.7)',2); line(x=>A*Math.sin(k*x+om*t),'rgba(197,48,48,.7)',2);}
+  line(x=>A*Math.sin(k*x-om*t)+A*Math.sin(k*x+om*t),'#222',3);
+  ctx.font='bold 13px system-ui';
+  for(let m=0;m<=n;m++){const x=x0+m*L/n; ctx.fillStyle='#c53030'; ctx.beginPath(); ctx.arc(x,y0,5,0,7); ctx.fill(); ctx.fillText('N',x-4,y0+2*A+26);}
+  for(let m=0;m<n;m++){const x=x0+(m+0.5)*L/n; ctx.fillStyle='#2f855a'; ctx.fillText('V',x-4,y0+2*A+26);}
+  ctx.fillStyle='#444'; ctx.font='13px system-ui'; ctx.fillText(`mode ${n} : L = ${n} × λ/2   →   f${n} = ${n} × f1`,x0,18);
+ });
+}
+
+/* ================= 3b. Résonance ================= */
+function initRes(){
+ const cv=$('#cvRes'); let fe=0.6; const z=0.025, modes=[1,2,3,4,5];
+ const resp=f=>modes.map(n=>(1/n)/Math.sqrt(Math.pow(1-(f/n)**2,2)+Math.pow(2*z*f/n,2)));
+ const shape=(r,X)=>r.reduce((s,a,j)=>s+a*Math.sin((j+1)*Math.PI*X),0);
+ const ampOf=f=>{const r=resp(f); let m=0; for(let i=0;i<=60;i++) m=Math.max(m,Math.abs(shape(r,i/60))); return m;};
+ const curve=[]; for(let f=0.2;f<=4.601;f+=0.01) curve.push([f,ampOf(f)]);
+ const Mx=Math.max(...curve.map(c=>c[1]));
+ let osc=null, gn=null;
+ const lab=()=>{$('#resFv').textContent=fmt(fe,2)+' × f₁';};
+ const audio=()=>{if(!osc) return; const a=ampOf(fe); osc.frequency.setTargetAtTime(110*fe,AC.currentTime,0.03); gn.gain.setTargetAtTime(0.01+0.3*a/Mx,AC.currentTime,0.05);};
+ $('#resF').oninput=e=>{fe=+e.target.value; lab(); audio();}; lab();
+ $('#resSnd').onclick=()=>{const c=ac(); if(osc){osc.stop(); osc=null; $('#resSnd').classList.remove('on'); $('#resSnd').textContent='🔊 Écouter'; return;}
+  osc=c.createOscillator(); osc.type='triangle'; gn=c.createGain(); gn.gain.value=0; osc.connect(gn); gn.connect(c.destination); osc.start(); $('#resSnd').classList.add('on'); $('#resSnd').textContent='⏹ Arrêter'; audio();};
+ addAnim(cv,330,(ctx,w,h,t)=>{const x0=40,x1=w-40,L=x1-x0,y0=90; const r=resp(fe), sc=70/Mx, om=2*Math.PI*fe*0.9;
+  ctx.fillStyle='#666'; ctx.fillRect(x0-12,y0-60,10,120); ctx.fillRect(x1+2,y0-60,10,120);
+  ctx.strokeStyle='#222'; ctx.lineWidth=3; ctx.beginPath();
+  for(let i=0;i<=200;i++){const X=i/200; let y=sc*shape(r,X)*Math.cos(om*t); y=Math.max(-75,Math.min(75,y)); const px=x0+X*L; i?ctx.lineTo(px,y0-y):ctx.moveTo(px,y0-y);} ctx.stroke();
+  const gy0=h-25, gh=130, fx=f=>x0+(f-0.2)/4.4*L;
+  ctx.strokeStyle='#999'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x0,gy0); ctx.lineTo(x1,gy0); ctx.moveTo(x0,gy0); ctx.lineTo(x0,gy0-gh); ctx.stroke();
+  ctx.fillStyle='#666'; ctx.font='12px system-ui'; ctx.fillText('amplitude',x0+4,gy0-gh+4);
+  for(let n=1;n<=4;n++){ctx.fillText(n+' f₁',fx(n)-10,gy0+15); ctx.beginPath(); ctx.moveTo(fx(n),gy0); ctx.lineTo(fx(n),gy0+4); ctx.stroke();}
+  ctx.strokeStyle='#2b6cb0'; ctx.lineWidth=2; ctx.beginPath(); curve.forEach((c,i)=>{const x=fx(c[0]), y=gy0-gh*c[1]/Mx; i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke();
+  const cx=fx(fe), cy=gy0-gh*ampOf(fe)/Mx; ctx.fillStyle='#c53030'; ctx.beginPath(); ctx.arc(cx,cy,6,0,7); ctx.fill();
+  ctx.strokeStyle='rgba(197,48,48,.4)'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(cx,gy0); ctx.lineTo(cx,cy); ctx.stroke(); ctx.setLineDash([]);
+ });
+}
+
+/* ================= 4a. Synthé ================= */
+function initSyn(){
+ const cv=$('#cvSyn'); const amps=[1,0,0,0,0,0,0,0]; let f0=220, lame=false, oscs=null, master=null;
+ const box=$('#synSliders');
+ box.innerHTML=amps.map((a,i)=>`<label style="flex-direction:column;gap:0;font-size:12px">H${i+1}<input type="range" min="0" max="1" step="0.01" value="${a}" data-h="${i}" style="width:80px"></label>`).join('');
+ const sl=$$('input',box);
+ const live=()=>{if(!oscs) return; const sum=amps.reduce((s,a)=>s+a,0)||1; oscs.forEach((o,i)=>{o.o.frequency.setTargetAtTime(f0*(i+1),AC.currentTime,0.02); o.g.gain.setTargetAtTime(amps[i]/sum*0.3,AC.currentTime,0.03);});};
+ sl.forEach(s=>s.oninput=()=>{amps[+s.dataset.h]=+s.value; lame=false; live();});
+ const fl=()=>$('#synFv').textContent=f0+' Hz ('+nearest(f0).name+')';
+ $('#synF').oninput=e=>{f0=+e.target.value; fl(); live();}; fl();
+ const P={pur:[1,0,0,0,0,0,0,0],ouvert:[1,.5,.33,.25,.2,.17,.14,.12],ferme:[1,0,.33,0,.2,0,.14,0],riche:[1,.8,.6,.7,.3,.5,.2,.3]};
+ $$('[data-p]').forEach(b=>b.onclick=()=>{const p=b.dataset.p;
+  if(p==='lame'){lame=true; if(oscs) stop(); strike([{f:f0,a:1,tau:1.2},{f:f0*2.756,a:.5,tau:.5},{f:f0*5.404,a:.3,tau:.25}]); return;}
+  lame=false; P[p].forEach((a,i)=>{amps[i]=a; sl[i].value=a;}); live();});
+ function stop(){oscs.forEach(o=>o.o.stop()); oscs=null; $('#synPlay').classList.remove('on'); $('#synPlay').textContent='▶ Écouter en continu';}
+ $('#synPlay').onclick=()=>{if(oscs){stop(); return;} const c=ac(); lame=false; master=c.createGain(); master.gain.value=1; master.connect(c.destination);
+  oscs=amps.map((a,i)=>{const o=c.createOscillator(), g=c.createGain(); o.frequency.value=f0*(i+1); g.gain.value=0; o.connect(g); g.connect(master); o.start(); return {o,g};});
+  $('#synPlay').classList.add('on'); $('#synPlay').textContent='⏹ Arrêter'; live();};
+ addAnim(cv,230,(ctx,w,h,t)=>{const ww=w*0.58, pad=12, y0=h/2;
+  const comps= lame? [[1,1],[2.756,.5],[5.404,.3]] : amps.map((a,i)=>[i+1,a]);
+  const sum=comps.reduce((s,c)=>s+c[1],0)||1;
+  ctx.strokeStyle='#ddd'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(pad,y0); ctx.lineTo(ww-pad,y0); ctx.stroke();
+  ctx.strokeStyle='#c2562b'; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let i=0;i<=400;i++){const X=i/400*3; let y=0; comps.forEach(c=>y+=c[1]*Math.sin(2*Math.PI*c[0]*X)); const px=pad+(ww-2*pad)*i/400, py=y0-(h/2-20)*y/sum; i?ctx.lineTo(px,py):ctx.moveTo(px,py);} ctx.stroke();
+  ctx.fillStyle='#666'; ctx.font='12px system-ui'; ctx.fillText('signal (3 périodes du fondamental)',pad,16);
+  const sx0=ww+20, sx1=w-15, sy=h-28, maxR=lame?6:8.5, fxp=r=>sx0+(sx1-sx0)*r/maxR;
+  ctx.strokeStyle='#999'; ctx.beginPath(); ctx.moveTo(sx0,sy); ctx.lineTo(sx1,sy); ctx.stroke();
+  ctx.fillText('spectre (fréquence →)',sx0,16);
+  comps.forEach(c=>{if(c[1]<=0) return; const x=fxp(c[0]); ctx.fillStyle=lame?'#4a5568':'#2b6cb0'; ctx.fillRect(x-5,sy-(h-70)*c[1],10,(h-70)*c[1]); ctx.fillStyle='#444'; ctx.fillText((lame?fmt(c[0],2):c[0])+'f₁',x-12,sy+15);});
+ });
+}
+
+/* ================= 4b. Analyseur micro ================= */
+let lastPeak=null;
+function initMic(){
+ const cv=$('#cvMic'); let analyser=null, buf=null, frozen=false, armed=true, pk={list:[],max:-200};
+ const msg=$('#micMsg');
+ $('#micStart').onclick=async()=>{
+  if(analyser) return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg.innerHTML='⚠ Micro inaccessible depuis ce navigateur ou ce mode d\'ouverture. Essayez Chrome, Edge ou Firefox, ou utilisez l\'application <b>phyphox</b> sur téléphone.'; return;}
+  try{const c=ac(); const st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+   const src=c.createMediaStreamSource(st); analyser=c.createAnalyser(); analyser.fftSize=16384; analyser.smoothingTimeConstant=0.2; src.connect(analyser);
+   buf=new Float32Array(analyser.frequencyBinCount); $('#micStart').textContent='🎤 Micro actif'; $('#micStart').classList.add('on');
+  }catch(e){msg.innerHTML='⚠ Accès au micro refusé ou impossible ('+esc(e.name||e)+'). Autorisez le micro dans le navigateur, ou utilisez <b>phyphox</b> sur téléphone.';}
+ };
+ $('#micFreeze').onclick=()=>{frozen=!frozen; armed=!frozen; $('#micFreeze').textContent=frozen?'▶ Reprendre':'⏸ Figer'; $('#micFreeze').classList.toggle('on',frozen);};
+ $('#micToJournal').onclick=()=>{if(!lastPeak){alert('Aucune mesure : activez le micro et produisez un son.'); return;}
+  state.journal.push({date:new Date().toLocaleDateString('fr-FR'),obj:'',dim:'',fp:'',fm:lastPeak.toFixed(1),rem:''}); renderJournal(); save();
+  $('#micToJournal').textContent='✔ Ajouté (partie 9)'; setTimeout(()=>$('#micToJournal').textContent='➕ Ajouter la mesure au journal',1500);};
+ function findPeaks(){const df=AC.sampleRate/analyser.fftSize; const iMin=Math.max(2,Math.floor(50/df)), iMax=Math.min(buf.length-2,Math.floor(5000/df)); let mx=-200;
+  for(let i=iMin;i<=iMax;i++) if(isFinite(buf[i])&&buf[i]>mx) mx=buf[i];
+  const res=[]; for(let i=iMin+1;i<iMax;i++){const v=buf[i]; if(isFinite(v)&&v>buf[i-1]&&v>=buf[i+1]&&v>mx-30&&v>-85){const a=buf[i-1],b=v,c=buf[i+1]; const den=a-2*b+c; const p=den?0.5*(a-c)/den:0; res.push({f:(i+p)*df,db:v});}}
+  res.sort((x,y)=>y.db-x.db); const sel=[]; for(const r of res){if(sel.every(s=>Math.abs(s.f/r.f-1)>0.04)) sel.push(r); if(sel.length>=4) break;}
+  return {list:sel.sort((x,y)=>x.f-y.f),max:mx};}
+ addAnim(cv,220,(ctx,w,h,t)=>{const x0=40,x1=w-10,y1=h-24, fmin=50,fmax=5000, fx=f=>x0+(x1-x0)*Math.log(f/fmin)/Math.log(fmax/fmin), dby=d=>y1-(y1-10)*(d+110)/90;
+  ctx.strokeStyle='#eee'; ctx.lineWidth=1; ctx.fillStyle='#888'; ctx.font='11px system-ui';
+  [50,100,200,500,1000,2000,5000].forEach(f=>{const x=fx(f); ctx.beginPath(); ctx.moveTo(x,10); ctx.lineTo(x,y1); ctx.stroke(); ctx.fillText(f>=1000?(f/1000)+' kHz':f+' Hz',x-14,h-8);});
+  if(!analyser){ctx.fillStyle='#999'; ctx.font='15px system-ui'; ctx.fillText('Cliquez sur « Activer le micro »',x0+20,h/2); return;}
+  if(!frozen){analyser.getFloatFrequencyData(buf); pk=findPeaks();
+   if($('#micAuto').checked&&armed&&pk.max>-50){armed=false; setTimeout(()=>{frozen=true; $('#micFreeze').textContent='▶ Reprendre'; $('#micFreeze').classList.add('on');},180);}}
+  const df=AC.sampleRate/analyser.fftSize; ctx.strokeStyle='#2b6cb0'; ctx.lineWidth=1.5; ctx.beginPath(); let st=false;
+  for(let i=Math.floor(fmin/df);i<Math.min(buf.length,fmax/df);i++){const v=isFinite(buf[i])?buf[i]:-110; const x=fx(i*df), y=Math.max(10,Math.min(y1,dby(v))); st?ctx.lineTo(x,y):(ctx.moveTo(x,y),st=true);} ctx.stroke();
+  pk.list.forEach(p=>{const x=fx(p.f); ctx.fillStyle='#c53030'; ctx.beginPath(); ctx.arc(x,dby(p.db),4,0,7); ctx.fill(); ctx.fillText(Math.round(p.f)+'',x+5,dby(p.db)-4);});
+  if(pk.list.length){const strongest=pk.list.reduce((a,b)=>b.db>a.db?b:a); lastPeak=strongest.f; const f1=pk.list[0].f;
+   $('#micNote').textContent=`${fmt(strongest.f,1)} Hz → ${noteTxt(strongest.f)}`+(frozen?'  (figé)':'');
+   $('#micPeaks').innerHTML='Pics (du plus grave au plus aigu) : '+pk.list.map(p=>`<span class="tag">${fmt(p.f,1)} Hz · ×${fmt(p.f/f1,2)}</span>`).join(' ')+'<br><span class="muted">×… = rapport au pic le plus grave : 1 ; 2 ; 3… pour des harmoniques, environ 2,76 pour une lame.</span>';}
+ });
+}
+
+/* ================= 5. Clavier ================= */
+function initKbd(){
+ const k=$('#kbd'); const white=[0,2,4,5,7,9,11], keys=[]; let wx=0;
+ for(let oct=3;oct<=5;oct++){for(let idx=0;idx<12;idx++){if(oct===5&&idx>0) break; const isW=white.includes(idx); const f=freqNote(idx,oct);
+  const d=document.createElement('div'); d.className=isW?'w':'b'; d.dataset.f=f; d.dataset.n=NOTES[idx]+oct; d.dataset.idx=idx;
+  if(isW){d.style.left=(wx*44)+'px'; d.innerHTML=`<span>${NOTES[idx]}${oct}</span>`; wx++;} else d.style.left=(wx*44-14)+'px';
+  k.appendChild(d); keys.push(d);}}
+ k.style.width=(wx*44)+'px';
+ let prev=null;
+ const play=(d)=>{const f=+d.dataset.f; strike([{f,a:1,tau:.9},{f:2*f,a:.25,tau:.4},{f:3*f,a:.12,tau:.25}]); d.classList.add('hit'); setTimeout(()=>d.classList.remove('hit'),200);
+  $('#kbdInfo').textContent=`${d.dataset.n} : ${fmt(f,2)} Hz`;
+  if(prev&&prev!==d){const f1=+prev.dataset.f; $('#kbdRatio').textContent=`Rapport ${d.dataset.n} / ${prev.dataset.n} = ${fmt(f/f1,3)}`;} prev=d;};
+ keys.forEach(d=>d.addEventListener('pointerdown',()=>play(d)));
+ $('#kbdPenta').onchange=e=>keys.forEach(d=>d.classList.toggle('penta',e.target.checked&&[0,2,4,7,9].includes(+d.dataset.idx)&&d.classList.contains('w')));
+ const SC={maj:[0,2,4,5,7,9,11,12],penta:[0,2,4,7,9,12],chrom:[0,1,2,3,4,5,6,7,8,9,10,11,12]};
+ $$('[data-sc]').forEach(b=>b.onclick=()=>{SC[b.dataset.sc].forEach((s,i)=>setTimeout(()=>play(keys[s]),i*330));});
+ let h='<table class="freqtab"><tr><th>Octave</th>'+NOTES.map(n=>`<th>${n}</th>`).join('')+'</tr>';
+ for(let o=2;o<=5;o++){h+=`<tr><th>${o}</th>`+NOTES.map((n,i)=>`<td${i===9&&o===3?' style="background:#fde8c8;font-weight:700"':''}>${fmt(freqNote(i,o),1)}</td>`).join('')+'</tr>';}
+ $('#freqTable').innerHTML=h+'</table>';
+}
+
+/* ================= 6. Tube ================= */
+function initTube(){
+ const cv=$('#cvTube'); let n=1;
+ const bs=$$('#tubeModes button'); bs.forEach(b=>b.onclick=()=>{n=+b.dataset.n; setOn(bs,x=>x===b); out();});
+ const P=()=>{const type=$('#tubeType').value, L=num($('#tubeL').value)/100, r=num($('#tubeD').value)/2000, T=num($('#tubeT').value); const v=331.3+0.606*T;
+  let f1,rank; if(type==='oo'){f1=v/(2*(L+1.2*r)); rank=n;} else {f1=v/(4*(L+0.6*r)); rank=2*n-1;} return {type,L,r,v,f1,rank,fn:f1*rank};};
+ function out(){const p=P(); $('#tubeLv').textContent=fmt(p.L*100,1)+' cm';
+  $('#tubeOut').innerHTML=`v = ${fmt(p.v,0)} m/s · <b>fondamental f₁ = ${fmt(p.f1,1)} Hz</b> → ${noteTxt(p.f1)}<br>Mode affiché : harmonique de rang ${p.rank}, f = ${fmt(p.fn,1)} Hz, λ = ${fmt(p.v/p.fn*100,1)} cm`;}
+ ['tubeType','tubeL','tubeD','tubeT'].forEach(id=>$('#'+id).addEventListener('input',out)); out();
+ $('#tubePlay').onclick=()=>{const p=P(); const parts=[]; for(let k=1;k<=8;k++){if(p.type==='fo'&&k%2===0) continue; parts.push({f:p.f1*k,a:1/k});} blow(parts,1.6);};
+ const jit=[]; for(let i=0;i<46*4;i++) jit.push([(Math.random()-0.5)*6,(Math.random()-0.5)*8]);
+ addAnim(cv,250,(ctx,w,h,t)=>{const p=P(), x0=70, x1=w-50, L=x1-x0, yc=170, th=36, om=2*Math.PI*0.9;
+  const u=X=>p.type==='oo'?Math.cos(n*Math.PI*X):Math.sin((2*n-1)*Math.PI*X/2);
+  const ye=65; ctx.strokeStyle='#eee'; ctx.beginPath(); ctx.moveTo(x0,ye); ctx.lineTo(x1,ye); ctx.stroke();
+  ctx.fillStyle='#666'; ctx.font='12px system-ui'; ctx.fillText('amplitude de vibration de l\'air',x0,18);
+  ctx.strokeStyle='#c2562b'; ctx.lineWidth=2;
+  [1,-1].forEach(sg=>{ctx.beginPath(); for(let i=0;i<=200;i++){const X=i/200, y=ye-sg*32*Math.abs(u(X)); i?ctx.lineTo(x0+X*L,y):ctx.moveTo(x0+X*L,y);} ctx.stroke();});
+  ctx.font='bold 13px system-ui';
+  const nodes=[], vent=[];
+  if(p.type==='oo'){for(let m=0;m<n;m++) nodes.push((m+0.5)/n); for(let m=0;m<=n;m++) vent.push(m/n);}
+  else {for(let m=0;m<n;m++) nodes.push(2*m/(2*n-1)); for(let m=0;m<n;m++) vent.push((2*m+1)/(2*n-1));}
+  nodes.forEach(X=>{ctx.fillStyle='#c53030'; ctx.fillText('N',x0+X*L-4,ye+52);}); vent.forEach(X=>{ctx.fillStyle='#2f855a'; ctx.fillText('V',x0+X*L-4,ye+52);});
+  ctx.strokeStyle='#888'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(x0,yc-th); ctx.lineTo(x1,yc-th); ctx.moveTo(x0,yc+th); ctx.lineTo(x1,yc+th); ctx.stroke();
+  if(p.type==='fo'){ctx.fillStyle='#555'; ctx.fillRect(x0-12,yc-th-2,12,2*th+4);}
+  ctx.fillStyle='#666'; ctx.font='12px system-ui'; ctx.fillText(p.type==='fo'?'fermé':'ouvert',x0-30,yc+th+22); ctx.fillText('ouvert',x1-20,yc+th+22);
+  for(let i=0;i<46;i++){const X=(i+0.5)/46; const dx=11*u(X)*Math.cos(om*t); for(let r=0;r<4;r++){const j=jit[i*4+r]; ctx.fillStyle='#2b6cb0'; ctx.beginPath(); ctx.arc(x0+X*L+dx+j[0],yc-24+r*16+j[1],2.6,0,7); ctx.fill();}}
+ });
+}
+
+/* ================= 7. Lame ================= */
+const BL=[4.730041,7.853205,10.995608];
+const NODES=[[0.2242,0.7758],[0.1321,0.5,0.8679],[0.0944,0.3558,0.6442,0.9056]];
+function phi(m,X){const b=BL[m]; const s=(Math.cosh(b)-Math.cos(b))/(Math.sinh(b)-Math.sin(b)); const x=b*X; return Math.cosh(x)+Math.cos(x)-s*(Math.sinh(x)+Math.sin(x));}
+function initBar(){
+ const cv=$('#cvBar'); let m=0, sup=[0.2242,0.7758], drag=-1;
+ const bs=$$('#barModes button'); bs.forEach(b=>b.onclick=()=>{m=+b.dataset.m; setOn(bs,x=>x===b);});
+ const P=()=>{const o=$('#barMat').selectedOptions[0]; const c=+o.value, kind=o.dataset.k, e=num($('#barE').value)/1000, L=num($('#barL').value)/100;
+  const f1=1.028*e*c/(L*L); const tau0=kind==='metal'?[2.2,0.9,0.45]:[0.7,0.3,0.15];
+  const taus=tau0.map((t0,k)=>t0/(1+25*(phi(k,sup[0])**2+phi(k,sup[1])**2)/2)); return {c,kind,e,L,f1,taus};};
+ function out(){const p=P(); $('#barLv').textContent=fmt(p.L*100,1)+' cm';
+  const d=p.taus[0]*3; const q=d>4?'excellente : la lame sonne longtemps':d>1.5?'correcte':d>0.5?'médiocre : le son est vite étouffé':'mauvaise : le son est étouffé';
+  $('#barOut').innerHTML=`<b>f₁ = ${fmt(p.f1,1)} Hz</b> → ${noteTxt(p.f1)} · partiels : ${fmt(p.f1*2.756,0)} Hz et ${fmt(p.f1*5.404,0)} Hz<br>Nœuds du fondamental à ${fmt(0.224*p.L*100,1)} cm de chaque bout · supports à ${fmt(sup[0]*100,1)} % et ${fmt(sup[1]*100,1)} % · durée de résonance ≈ ${fmt(d,1)} s (${q})`;}
+ ['barMat','barE','barL'].forEach(id=>$('#'+id).addEventListener('input',out));
+ $('#barNodes').onclick=()=>{sup=[0.2242,0.7758]; out();}; $('#barEnds').onclick=()=>{sup=[0.03,0.97]; out();};
+ $('#barPlay').onclick=()=>{const p=P(); strike([{f:p.f1,a:1,tau:p.taus[0]},{f:p.f1*2.756,a:.5,tau:p.taus[1]},{f:p.f1*5.404,a:.3,tau:p.taus[2]}]);};
+ out();
+ const X0=50, toX=(px,w)=>Math.max(0,Math.min(1,(px-X0)/(w-2*X0)));
+ cv.addEventListener('pointerdown',e=>{const r=cv.getBoundingClientRect(), X=toX(e.clientX-r.left,r.width); const d0=Math.abs(X-sup[0]), d1=Math.abs(X-sup[1]); if(Math.min(d0,d1)<0.06){drag=d0<d1?0:1; try{cv.setPointerCapture(e.pointerId);}catch(_){}}});
+ cv.addEventListener('pointermove',e=>{if(drag<0) return; const r=cv.getBoundingClientRect(); let X=toX(e.clientX-r.left,r.width); sup[drag]=X; if($('#barSym').checked) sup[1-drag]=1-X; out();});
+ const up=()=>drag=-1; cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
+ addAnim(cv,230,(ctx,w,h,t)=>{const p=P(), x0=X0, x1=w-X0, L=x1-x0, y0=100, om=2*Math.PI*0.8;
+  const col=p.kind==='metal'?(p.c>5100?'#4a5568':'#9aa5b1'):(p.c>4300?'#c8955a':'#8b5a2b');
+  ctx.strokeStyle='#eee'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
+  NODES[m].forEach(X=>{ctx.setLineDash([4,4]); ctx.strokeStyle='#e0a0a0'; ctx.beginPath(); ctx.moveTo(x0+X*L,20); ctx.lineTo(x0+X*L,h-40); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='#c53030'; ctx.font='11px system-ui'; ctx.fillText(fmt(X*100,1)+' %',x0+X*L-16,h-28);});
+  ctx.strokeStyle=col; ctx.lineWidth=11; ctx.lineCap='round'; ctx.beginPath();
+  for(let i=0;i<=120;i++){const X=i/120, y=y0-16*phi(m,X)*Math.cos(om*t); i?ctx.lineTo(x0+X*L,y):ctx.moveTo(x0+X*L,y);} ctx.stroke();
+  sup.forEach(X=>{const x=x0+X*L; ctx.fillStyle='#f6e05e'; ctx.fillRect(x-12,y0+40,24,8); ctx.fillStyle='#2b6cb0'; ctx.beginPath(); ctx.moveTo(x,y0+48); ctx.lineTo(x-14,y0+76); ctx.lineTo(x+14,y0+76); ctx.fill();});
+  ctx.fillStyle='#666'; ctx.font='12px system-ui'; ctx.fillText(`mode ${m+1} : f = ${m===0?'f₁':(m===1?'2,76 f₁':'5,40 f₁')} · pointillés = nœuds · triangles = supports (mousse en jaune)`,x0,16);
+ });
+ // Caractérisation
+ const car=()=>{const L=num($('#carL').value)/100, e=num($('#carE').value)/1000, b=num($('#carB').value)/1000, mg=num($('#carM').value)/1000, f=num($('#carF').value);
+  if(!(L>0&&e>0&&f>0)){$('#carOut').textContent='Renseignez L, e et la fréquence mesurée.'; return;}
+  const c=f*L*L/(1.028*e); let s=`√(E/ρ) ≈ ${fmt(c,0)} m/s`;
+  if(mg>0&&b>0){const rho=mg/(L*b*e), E=rho*c*c; s+=` · ρ ≈ ${fmt(rho,0)} kg/m³ · E ≈ ${fmt(E/1e9,1)} GPa`;} $('#carOut').textContent=s;};
+ ['carL','carE','carB','carM','carF'].forEach(id=>$('#'+id).addEventListener('input',car)); car();
+}
+
+/* ================= 8. Calculateur ================= */
+const SCALES={penta:[0,2,4,7,9],maj:[0,2,4,5,7,9,11],minp:[0,3,5,7,10],chrom:[0,1,2,3,4,5,6,7,8,9,10,11]};
+function calcCompute(){
+ const g=id=>$('#'+id); const type=g('calcType').value, D=num(g('calcD').value), T=num(g('calcTemp').value), mat=g('calcMat').value;
+ const c=mat==='custom'?num(g('calcC').value):+mat, e=num(g('calcE').value)/1000, sc=SCALES[g('calcScale').value]||SCALES.penta;
+ const idx=+g('calcNote').value, oct=+g('calcOct').value, N=Math.max(1,Math.min(24,parseInt(g('calcN').value)||6)), marge=g('calcMarge').checked;
+ const f0=freqNote(idx,oct), v=331.3+0.606*T, r=D/2000; const rows=[]; let tot=0, warn=[];
+ for(let k=0;k<N;k++){const off=sc[k%sc.length]+12*Math.floor(k/sc.length); const f=f0*Math.pow(2,off/12); let L;
+  if(type==='tube_o') L=v/(2*f)-1.2*r; else if(type==='tube_f') L=v/(4*f)-0.6*r; else L=Math.sqrt(1.028*e*c/f);
+  const Lc=L*100, cut=marge?Lc*1.02:Lc; tot+=cut+0.3; rows.push({name:nearest(f).name,f,Lc,cut,app:0.224*Lc});}
+ const maxL=Math.max(...rows.map(x=>x.Lc)), minL=Math.min(...rows.map(x=>x.Lc));
+ if(maxL>150) warn.push(`L'élément le plus long mesure ${fmt(maxL,0)} cm : encombrant. Commencez plus haut d'une octave${type==='tube_o'?' ou utilisez des tubes fermés':''}.`);
+ if(type==='lame'&&minL<8) warn.push(`La lame la plus courte mesure ${fmt(minL,1)} cm : difficile à jouer. Choisissez une octave plus grave ou un matériau plus fin.`);
+ if(type!=='lame'&&minL<6) warn.push(`Le tube le plus court mesure ${fmt(minL,1)} cm : la correction d'extrémité devient imprécise. Choisissez une octave plus grave.`);
+ if(type!=='lame'&&D>60) warn.push('Gros diamètre : la correction d\'extrémité est importante. Vérifiez par la mesure.');
+ return {type,rows,tot,v,c,e,marge,warn,D};
+}
+function calcHTML(R){
+ const lame=R.type==='lame';
+ let h=`<table><tr><th>N°</th><th>Note</th><th>f (Hz)</th><th>Longueur théorique (cm)</th>${R.marge?'<th>À couper (+2 %) (cm)</th>':''}${lame?'<th>Appuis (nœuds) à … cm de chaque bout</th>':''}</tr>`;
+ R.rows.forEach((x,i)=>{h+=`<tr><td>${i+1}</td><td>${x.name}</td><td>${fmt(x.f,1)}</td><td>${fmt(x.Lc,1)}</td>${R.marge?`<td><b>${fmt(x.cut,1)}</b></td>`:''}${lame?`<td>${fmt(x.app,1)}</td>`:''}</tr>`;});
+ h+='</table>';
+ const ty={tube_o:'tubes ouverts aux deux bouts',tube_f:'tubes fermés à un bout',lame:'lames / lattes'}[R.type];
+ h+=`<p>Type : ${ty} · ${lame?`√(E/ρ) = ${fmt(R.c,0)} m/s, épaisseur ${fmt(R.e*1000,1)} mm`:`v = ${fmt(R.v,0)} m/s, Ø intérieur ${fmt(R.D,0)} mm`}<br><b>Longueur totale de matière ≈ ${fmt(R.tot/100,2)} m</b> (traits de scie compris).</p>`;
+ if(R.warn.length) h+=`<div class="box warn">${R.warn.map(esc).join('<br>')}</div>`;
+ return h;
+}
+function initCalc(){
+ const sn=$('#calcNote'); sn.innerHTML=NOTES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+ if(state.fields.calcNote!==undefined) sn.value=state.fields.calcNote;
+ const run=()=>{const t=$('#calcType').value; $('#calcTubeP').style.display=t==='lame'?'none':''; $('#calcLameP').style.display=t==='lame'?'':'none';
+  $('#calcCwrap').style.display=$('#calcMat').value==='custom'?'':'none'; $('#calcOut').innerHTML=calcHTML(calcCompute());};
+ $$('#s8 [data-key]').forEach(el=>{el.addEventListener('input',run); el.addEventListener('change',run);}); run();
+}
+
+/* ================= 9. Journal ================= */
+function ecart(r){const a=num(r.fp), b=num(r.fm); return (a>0&&b>0)?(b/a-1)*100:NaN;}
+function renderJournal(){
+ const tb=$('#journalTable tbody'); const F=['date','obj','dim','fp','fm','ec','rem'];
+ tb.innerHTML=state.journal.map((r,i)=>`<tr>${F.map(f=>f==='ec'?`<td class="ec">${Number.isFinite(ecart(r))?fmt(ecart(r),1)+' %':''}</td>`:(f==='rem'||f==='obj'||f==='dim')?`<td><textarea data-i="${i}" data-f="${f}">${esc(r[f])}</textarea></td>`:`<td><input data-i="${i}" data-f="${f}" value="${esc(r[f])}"></td>`).join('')}<td><button class="del" data-del="${i}">✕</button></td></tr>`).join('');
+ $$('[data-f]',tb).forEach(el=>el.addEventListener('input',()=>{const r=state.journal[+el.dataset.i]; r[el.dataset.f]=el.value; save(); const ec=el.closest('tr').querySelector('.ec'); const v=ecart(r); ec.textContent=Number.isFinite(v)?fmt(v,1)+' %':'';}));
+ $$('[data-del]',tb).forEach(b=>b.onclick=()=>{if(confirm('Supprimer cette ligne ?')){state.journal.splice(+b.dataset.del,1); renderJournal(); save();}});
+}
+/* ================= Photos ================= */
+function renderPhotos(){
+ $('#photoGrid').innerHTML=state.photos.map((p,i)=>`<figure><img src="${p.data}" alt=""><input placeholder="Légende…" data-pi="${i}" value="${esc(p.cap)}"><button class="del" data-pd="${i}">✕ retirer</button></figure>`).join('');
+ $$('[data-pi]').forEach(el=>el.oninput=()=>{state.photos[+el.dataset.pi].cap=el.value; save();});
+ $$('[data-pd]').forEach(b=>b.onclick=()=>{state.photos.splice(+b.dataset.pd,1); renderPhotos(); save();});
+}
+function initPhotos(){
+ $('#photoInput').onchange=e=>{const files=[...e.target.files]; files.forEach(f=>{if(state.photos.length>=8){alert('8 photos maximum.'); return;}
+  const rd=new FileReader(); rd.onload=()=>{const im=new Image(); im.onload=()=>{const s=Math.min(1,900/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.round(im.width*s); c.height=Math.round(im.height*s); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+   if(state.photos.length<8){state.photos.push({data:c.toDataURL('image/jpeg',0.62),cap:''}); renderPhotos(); save();}}; im.src=rd.result;}; rd.readAsDataURL(f);}); e.target.value='';};
+ renderPhotos();
+}
+/* ================= 10. Sources ================= */
+function renderSources(){
+ const L=$('#sourcesList'); const types=['Site web','Vidéo','Livre','Article / revue','Musée / exposition','Autre'];
+ L.innerHTML=state.sources.map((s,i)=>`<div class="src"><div class="row"><input placeholder="Titre et auteur" data-si="${i}" data-sf="titre" value="${esc(s.titre)}"><input placeholder="Lien ou référence (date de consultation)" data-si="${i}" data-sf="ref" value="${esc(s.ref)}"><select data-si="${i}" data-sf="type">${types.map(t=>`<option${s.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
+  <textarea placeholder="Ce que j'en retiens (avec mes mots)" data-si="${i}" data-sf="ret">${esc(s.ret)}</textarea>
+  <textarea placeholder="Fiabilité : qui est l'auteur ? la date ? l'info est-elle confirmée ailleurs ?" data-si="${i}" data-sf="fiab" style="min-height:50px;margin-top:6px">${esc(s.fiab)}</textarea>
+  <button class="del" data-sd="${i}">✕ supprimer la source</button></div>`).join('');
+ $$('[data-sf]',L).forEach(el=>{const f=()=>{state.sources[+el.dataset.si][el.dataset.sf]=el.value; save();}; el.addEventListener('input',f); el.addEventListener('change',f);});
+ $$('[data-sd]',L).forEach(b=>b.onclick=()=>{if(confirm('Supprimer cette source ?')){state.sources.splice(+b.dataset.sd,1); renderSources(); save();}});
+}
+
+/* ================= Rapport PDF ================= */
+function reportBlock(ty){
+ if(ty==='calc') return '<h3>Dimensionnement calculé</h3>'+calcHTML(calcCompute());
+ if(ty==='journal'){if(!state.journal.length) return '<p><i>(journal vide)</i></p>';
+  return '<h3>Journal de mesures</h3><table><tr><th>Date</th><th>Objet</th><th>Dimensions</th><th>f prévue</th><th>f mesurée</th><th>Écart</th><th>Observations</th></tr>'+state.journal.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.obj)}</td><td>${esc(r.dim)}</td><td>${esc(r.fp)}</td><td>${esc(r.fm)}</td><td>${Number.isFinite(ecart(r))?fmt(ecart(r),1)+' %':''}</td><td>${esc(r.rem)}</td></tr>`).join('')+'</table>';}
+ if(ty==='photos'){if(!state.photos.length) return ''; return '<h3>Photos</h3><div class="rp-photos">'+state.photos.map(p=>`<figure class="rp-fig"><img src="${p.data}"><figcaption>${esc(p.cap)}</figcaption></figure>`).join('')+'</div>';}
+ if(ty==='sources'){if(!state.sources.length) return '<p><i>(aucune source)</i></p>';
+  return '<h3>Sources analysées</h3>'+state.sources.map((s,i)=>`<div class="rp-q"><div class="rp-ql">${i+1}. ${esc(s.titre)} <span style="font-weight:normal">[${esc(s.type)}]</span></div><div class="rp-a">${esc(s.ref)}<br><b>Ce que j'en retiens :</b> ${esc(s.ret).replace(/\n/g,'<br>')}<br><b>Fiabilité :</b> ${esc(s.fiab).replace(/\n/g,'<br>')}</div></div>`).join('');}
+ return '';
+}
+function buildReport(){
+ const F=state.fields; let h=`<h1>Faire sonner la matière — dossier personnel</h1><p><b>${esc(F.prenom||'')} ${esc(F.nom||'')}</b> · groupe ${esc(F.groupe||'—')} · binôme avec ${esc(F.binome||'—')}<br>DnMade Objet 1re année · ESAAT · Technologie et matériaux · ${new Date().toLocaleDateString('fr-FR')}</p>`;
+ $$('main section').forEach(sec=>{if(sec.dataset.report==='no') return; let inner='';
+  $$('.q, .sketch, .qcm, .report-block',sec).forEach(el=>{
+   if(el.classList.contains('q')){const lab=$('label',el)?.textContent||''; const f=$('[data-key]',el); const v=f?(state.fields[f.dataset.key]||''):'';
+    inner+=`<div class="rp-q"><div class="rp-ql">${esc(lab)}</div><div class="rp-a">${v.trim()?esc(v).replace(/\n/g,'<br>'):'<i>(pas de réponse)</i>'}</div></div>`;}
+   else if(el.classList.contains('sketch')){const d=state.sketches[el.dataset.key]; inner+=d?`<figure class="rp-fig"><img src="${d}"><figcaption>${esc(el.dataset.title)}</figcaption></figure>`:`<div class="rp-q"><div class="rp-ql">${esc(el.dataset.title)}</div><div class="rp-a"><i>(croquis non réalisé)</i></div></div>`;}
+   else if(el.classList.contains('qcm')){const v=state.qcm[el.dataset.key]; const lab=v?$(`input[value="${v}"]`,el).parentElement.textContent.trim():'(non répondu)'; const ok=v===el.dataset.answer;
+    inner+=`<div class="rp-q"><div class="rp-ql">${esc($('.qq',el).textContent)}</div><div class="rp-a">${esc(lab)} ${v?(ok?'✔':'✘'):''}</div></div>`;}
+   else inner+=reportBlock(el.dataset.type);
+  });
+  h+=`<h2>${esc($('h2',sec).textContent)}</h2>`+inner;});
+ $('#report').innerHTML=h;
+}
+function makePdf(){buildReport(); setTimeout(()=>window.print(),400);}
+
+/* ================= Boutons globaux ================= */
+function initGlobal(){
+ $('#btnPdf').onclick=makePdf; $('#btnPdf2').onclick=makePdf;
+ window.addEventListener('beforeprint',buildReport);
+ $('#btnExport').onclick=()=>{const blob=new Blob([JSON.stringify(state)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  const n=((state.fields.nom||'')+'_'+(state.fields.prenom||'')).replace(/[^\wÀ-ÿ-]+/g,'_')||'travail'; a.download=`son_${n}_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);};
+ $('#btnImport').onclick=()=>$('#fileImport').click();
+ $('#fileImport').onchange=e=>{const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{try{const s=JSON.parse(r.result); if(!s||!s.fields) throw 0; if(!confirm('Remplacer le travail présent dans ce navigateur par celui du fichier ?')) return; localStorage.setItem(KEY,JSON.stringify(s)); location.reload();}catch(err){alert('Fichier non reconnu.');}}; r.readAsText(f);};
+ $('#btnReset').onclick=()=>{if(confirm('Avez-vous bien exporté votre travail ? Tout sera effacé de ce navigateur.')&&confirm('Confirmer l\'effacement définitif ?')){localStorage.removeItem(KEY); location.reload();}};
+ $('#journalAdd').onclick=()=>{state.journal.push({date:new Date().toLocaleDateString('fr-FR'),obj:'',dim:'',fp:'',fm:'',rem:''}); renderJournal(); save();};
+ $('#srcAdd').onclick=()=>{state.sources.push({titre:'',ref:'',type:'Site web',ret:'',fiab:''}); renderSources(); save();};
+ // navigation active
+ const links=$$('nav#side a');
+ if('IntersectionObserver' in window){const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting) links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}),{rootMargin:'-40% 0px -55% 0px'}); $$('main section').forEach(s=>so.observe(s));}
+}
+
+/* ================= Démarrage ================= */
+bindFields(); initQcm(); $$('.sketch').forEach(initSketch);
+initOnde(); initRace(); initStat(); initRes(); initSyn(); initMic(); initKbd(); initTube(); initBar(); initCalc();
+renderJournal(); initPhotos(); renderSources(); initGlobal();
+if(!state.sources.length){state.sources.push({titre:'',ref:'',type:'Site web',ret:'',fiab:''}); renderSources();}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
